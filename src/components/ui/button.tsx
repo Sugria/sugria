@@ -15,7 +15,7 @@ const Button = ({
   return (
     <button
       className={cn(
-        'px-6 py-3 rounded-lg transition-all duration-200',
+        'px-6 py-3 transition-all duration-200',
         variant === 'primary' && 'bg-sugria-green text-white hover:bg-opacity-90',
         variant === 'outline' && 'border border-current hover:bg-opacity-10',
         className

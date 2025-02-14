@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Button from './ui/button'
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -41,19 +42,16 @@ const Header = () => {
             <a
               key={item}
               href={`#${item.toLowerCase().replace(' ', '-')}`}
-              className={`hover:text-[#2E8A57] transition-colors ${
+              className={`hover:underline transition-all ${
                 isScrolled || isMenuOpen ? 'text-gray-600' : 'text-white'
               }`}
             >
               {item}
             </a>
           ))}
-          <a
-            href="#contact"
-            className={`px-4 py-2 rounded-md bg-[#2E8A57] text-white hover:bg-[#1A6B3B] transition-colors`}
-          >
-            Contact
-          </a>
+          <Button className="bg-[#2E8A57] hover:bg-opacity-90">
+            <a href="#contact">Contact us</a>
+          </Button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -93,19 +91,15 @@ const Header = () => {
                 <a
                   key={item}
                   href={`#${item.toLowerCase().replace(' ', '-')}`}
-                  className="block text-gray-600 hover:text-[#2E8A57] transition-colors"
+                  className="block text-gray-600 hover:underline transition-all"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item}
                 </a>
               ))}
-              <a
-                href="#contact"
-                className="block px-4 py-2 rounded-md bg-[#2E8A57] text-white hover:bg-[#1A6B3B] transition-colors w-fit"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contact
-              </a>
+              <Button className="bg-[#2E8A57] hover:bg-opacity-90" onClick={() => setIsMenuOpen(false)}>
+                <a href="#contact">Contact</a>
+              </Button>
             </div>
           </div>
         </div>

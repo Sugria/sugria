@@ -23,7 +23,7 @@ const Hero = () => {
       {/* Content */}
       <div className="container mx-auto px-4 relative z-10 text-white">
         <div className="h-[30vh] md:h-[10vh] sm:h-[10vh]" /> {/* Increased spacer height on mobile */}
-        <h1 className="text-4xl md:text-7xl font-light mb-4 leading-[100%]">
+        <h1 className="text-4xl md:text-7xl font-bold mb-4 leading-[100%] tracking-[-1.5px] md:tracking-[-3px]">
           Cultivating<br />
           Sustainability,<br />
           Harvesting Hope

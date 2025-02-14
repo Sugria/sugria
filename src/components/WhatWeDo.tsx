@@ -53,7 +53,7 @@ const WhatWeDo = () => {
         ))}
       </div>
       <div className="container mx-auto px-4 relative">
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-light text-white mb-8 sm:mb-12 md:mb-16">
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-8 sm:mb-12 md:mb-16 tracking-[-1.5px] md:tracking-[-2px]">
           What we do
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -63,7 +63,7 @@ const WhatWeDo = () => {
               className="bg-white p-6 sm:p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 cursor-pointer hover:bg-gray-50"
             >
               <span className="text-3xl sm:text-4xl mb-4 sm:mb-6 block">{service.icon}</span>
-              <h3 className="text-xl sm:text-2xl font-light text-gray-800 mb-2 sm:mb-3">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2 sm:mb-3 tracking-[-1.5px] md:tracking-[-2px]">
                 {service.title}
               </h3>
               <p className="text-sm sm:text-base text-gray-600">

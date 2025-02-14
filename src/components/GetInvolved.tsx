@@ -6,13 +6,13 @@ const GetInvolved = () => {
   return (
     <AnimatedSection className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-6xl font-light mb-16 text-gray-900">
+        <h2 className="text-6xl font-bold mb-16 text-gray-900 tracking-[-1.5px] md:tracking-[-3px]">
           Get Involved
         </h2>
 
         <div className="grid md:grid-cols-2 gap-2 mb-8">
           <div className="bg-[#2E8A57] p-16">
-            <h3 className="text-white text-3xl font-light mb-4">
+            <h3 className="text-white text-3xl font-bold mb-4 tracking-[-1.5px] md:tracking-[-2px]">
               Partner with Us
             </h3>
             <p className="text-white mb-8">
@@ -27,7 +27,7 @@ const GetInvolved = () => {
           </div>
 
           <div className="bg-[#F4811F] p-16">
-            <h3 className="text-white text-3xl font-light mb-4">
+            <h3 className="text-white text-3xl font-bold mb-4 tracking-[-1.5px] md:tracking-[-2px]">
               Volunteer
             </h3>
             <p className="text-white mb-8">
