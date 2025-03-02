@@ -14,13 +14,13 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement | HTMLTe
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, name, error, helpText, type = 'text', options, className = '', ...props }, ref) => {
     const inputClasses = `
-      w-full px-3 py-2 border outline-none transition-colors
+      w-full px-3 py-2 border outline-none transition-colors text-black
       ${error 
         ? 'border-red-500 focus:border-red-700 bg-red-50' 
         : 'border-gray-300 focus:border-[#2E8A57] hover:border-gray-400'
       }
       disabled:bg-gray-100 disabled:cursor-not-allowed
-      placeholder:text-gray-600
+      placeholder:text-black placeholder:opacity-60
     `
 
     const renderInput = () => {
@@ -50,9 +50,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             }}
             {...props}
           >
-            <option value="" className="text-gray-900">Select {label.toLowerCase()}</option>
+            <option value="" className="text-black">Select {label.toLowerCase()}</option>
             {options.map((option) => (
-              <option key={option.value} value={option.value} className="text-gray-900">
+              <option key={option.value} value={option.value} className="text-black">
                 {option.label}
               </option>
             ))}
@@ -67,7 +67,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             id={name}
             type={type}
             name={name}
-            className={`${inputClasses} ${className} text-gray-900`}
+            className={`${inputClasses} ${className}`}
             {...props}
           />
         )
@@ -89,7 +89,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         <div className="flex items-center mb-1">
-          <label htmlFor={name} className="block text-sm font-medium text-gray-900">
+          <label htmlFor={name} className="block text-sm font-medium text-black">
             {label}
           </label>
           {helpText && <Tooltip text={helpText} />}
