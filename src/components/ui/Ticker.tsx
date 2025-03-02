@@ -18,29 +18,46 @@ const Ticker = ({ className, speed = 30, children }: TickerProps) => {
     const scrollerContent = contentRef.current
     const scrollerWidth = scrollerContent.offsetWidth
 
-    const clone = scrollerContent.cloneNode(true) as HTMLElement
-    scrollerRef.current.appendChild(clone)
+    // Create two clones for seamless looping
+    const clone1 = scrollerContent.cloneNode(true) as HTMLElement
+    const clone2 = scrollerContent.cloneNode(true) as HTMLElement
+    scrollerRef.current.appendChild(clone1)
+    scrollerRef.current.appendChild(clone2)
 
     let distance = 0
+    let animationFrame: number
+
     const scroll = () => {
-      distance -= (1 / speed) * 2
+      distance -= speed / 60
+      
+      // Reset position when first clone is fully visible
       if (distance <= -scrollerWidth) {
         distance = 0
       }
+      
       if (scrollerRef.current) {
         scrollerRef.current.style.transform = `translateX(${distance}px)`
       }
-      requestAnimationFrame(scroll)
+      
+      animationFrame = requestAnimationFrame(scroll)
     }
 
-    const animation = requestAnimationFrame(scroll)
+    animationFrame = requestAnimationFrame(scroll)
 
-    return () => cancelAnimationFrame(animation)
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame)
+      }
+    }
   }, [speed])
 
   return (
     <div className={cn("overflow-hidden", className)}>
-      <div ref={scrollerRef} className="flex whitespace-nowrap smooth-scroll">
+      <div 
+        ref={scrollerRef} 
+        className="flex whitespace-nowrap"
+        style={{ willChange: 'transform' }}
+      >
         <div ref={contentRef} className="flex gap-16 flex-nowrap">
           {children}
         </div>

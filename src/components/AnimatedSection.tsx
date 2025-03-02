@@ -9,7 +9,7 @@ interface AnimatedSectionProps {
 
 const AnimatedSection = ({ children, className = '' }: AnimatedSectionProps) => {
   const [ref, inView] = useInView({
-    triggerOnce: true,
+    triggerOnce: false, // Changed to false so animation repeats
     threshold: 0.1,
   })
 

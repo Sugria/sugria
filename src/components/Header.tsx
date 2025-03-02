@@ -3,8 +3,13 @@ import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Button from './ui/button'
+import Link from 'next/link'
 
-const Header = () => {
+interface HeaderProps {
+  variant?: 'primary' | 'secondary'
+}
+
+const Header = ({ variant = 'primary' }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -22,26 +27,28 @@ const Header = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       className={`fixed w-full z-50 transition-all duration-300 ${
-        isScrolled || isMenuOpen
+        isScrolled || isMenuOpen || variant === 'secondary'
           ? 'bg-white shadow-sm' 
           : 'bg-transparent'
       }`}
     >
       <nav className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Image
-          src={isScrolled || isMenuOpen ? '/logo-black.png' : '/logo.png'}
-          alt="Sugria Logo"
-          width={180}
-          height={77}
-          className="transition-opacity duration-300"
-        />
+        <Link href="/">
+          <Image
+            src={isScrolled || isMenuOpen ? '/logo-black.png' : '/logo.png'}
+            alt="Sugria Logo"
+            width={180}
+            height={77}
+            className="transition-opacity duration-300"
+          />
+        </Link>
         
         {/* Desktop Menu */}
         <div className="hidden md:flex space-x-6 items-center">
-          {['About Us', 'Impact', 'Blog'].map((item) => (
+          {['About', 'Impact', 'Blog'].map((item) => (
             <a
               key={item}
-              href={`#${item.toLowerCase().replace(' ', '-')}`}
+              href={item.toLowerCase() === 'about' ? '/about' : `#${item.toLowerCase()}`}
               className={`hover:underline transition-all ${
                 isScrolled || isMenuOpen ? 'text-gray-600' : 'text-white'
               }`}
@@ -49,7 +56,7 @@ const Header = () => {
               {item}
             </a>
           ))}
-          <Button className="bg-[#2E8A57] hover:bg-opacity-90">
+          <Button variant="outline" className={`border-white hover:bg-white hover:text-[#2E8A57] ${isScrolled || isMenuOpen ? 'text-[#2E8A57] border-[#2E8A57]' : 'text-white'}`}>
             <a href="#contact">Contact us</a>
           </Button>
         </div>
@@ -87,17 +94,17 @@ const Header = () => {
         >
           <div className="bg-white shadow-lg">
             <div className="container mx-auto px-4 py-6 space-y-4">
-              {['About Us', 'Impact', 'Blog'].map((item) => (
+              {['About', 'Impact', 'Blog'].map((item) => (
                 <a
                   key={item}
-                  href={`#${item.toLowerCase().replace(' ', '-')}`}
+                  href={item.toLowerCase() === 'about' ? '/about' : `#${item.toLowerCase()}`}
                   className="block text-gray-600 hover:underline transition-all"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item}
                 </a>
               ))}
-              <Button className="bg-[#2E8A57] hover:bg-opacity-90" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="outline" className="text-[#2E8A57] border-[#2E8A57] hover:bg-[#2E8A57] hover:text-white" onClick={() => setIsMenuOpen(false)}>
                 <a href="#contact">Contact</a>
               </Button>
             </div>
