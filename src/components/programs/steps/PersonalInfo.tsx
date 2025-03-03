@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/button'
 import { FormStepProps, PersonalFields } from '@/types/program'
+import { validatePhoneNumber } from '@/utils/phoneValidation'
 
 const genderOptions = [
   { value: 'male', label: 'Male' },
@@ -27,8 +28,8 @@ const PersonalInfo = ({ data, updateFields, next, prev }: FormStepProps) => {
       newErrors.email = 'Please enter a valid email address'
     }
 
-    if (data.personal.phoneNumber && !/^\+?[0-9]{10,}$/.test(data.personal.phoneNumber)) {
-      newErrors.phoneNumber = 'Please enter a valid phone number'
+    if (data.personal.phoneNumber && !validatePhoneNumber(data.personal.phoneNumber)) {
+      newErrors.phoneNumber = 'Please enter a valid Nigerian phone number (e.g., 08012345678 or +2348012345678)'
     }
 
     setErrors(newErrors)

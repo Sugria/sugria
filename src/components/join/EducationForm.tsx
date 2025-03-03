@@ -1,32 +1,43 @@
 'use client'
+import { useState } from 'react'
 import Input from '../ui/Input'
 import Button from '../ui/button'
 import Spinner from '../ui/Spinner'
-
-interface EducationFormData {
-  level: string
-  institution: string
-  fieldOfStudy: string
-  certifications: string
-}
+import { FormData } from '@/types/form'
 
 interface EducationFormProps {
-  data: EducationFormData
-  onChange: (data: EducationFormData) => void
+  data: FormData
+  updateFields: (fields: Partial<FormData>) => void
   onSubmit: () => void
-  onBack: () => void
+  prev: () => void
   isSubmitting?: boolean
 }
 
-const EducationForm = ({ data, onChange, onSubmit, onBack, isSubmitting = false }: EducationFormProps) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    onChange({ ...data, [name.split('.')[1] || name]: value })
+const EducationForm = ({ data, updateFields, onSubmit, prev, isSubmitting }: EducationFormProps) => {
+  const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const validate = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!data.education.level) {
+      newErrors.level = 'Education level is required'
+    }
+    if (!data.education.institution) {
+      newErrors.institution = 'Institution name is required'
+    }
+    if (!data.education.fieldOfStudy) {
+      newErrors.fieldOfStudy = 'Field of study is required'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit()
+    if (validate()) {
+      onSubmit()
+    }
   }
 
   return (
@@ -43,51 +54,58 @@ const EducationForm = ({ data, onChange, onSubmit, onBack, isSubmitting = false 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid md:grid-cols-2 gap-4">
           <Input
-            type="select"
+            name="level"
             label="Highest Level of Education"
-            name="education.level"
-            value={data.level}
-            onChange={handleChange}
+            type="select"
+            value={data.education.level}
+            onChange={e => updateFields({ education: { ...data.education, level: e.target.value } })}
+            error={errors.level}
+            required
             options={[
-              { value: 'certificate', label: 'Certificate' },
-              { value: 'diploma', label: 'Diploma' },
-              { value: 'degree', label: 'Degree' },
-              { value: 'masters', label: 'Masters' },
-              { value: 'phd', label: 'PhD' }
+              { value: "", label: "Select education level" },
+              { value: "High School", label: "High School" },
+              { value: "Bachelor's Degree", label: "Bachelor's Degree" },
+              { value: "Master's Degree", label: "Master's Degree" },
+              { value: "Doctorate", label: "Doctorate" },
+              { value: "Other", label: "Other" }
             ]}
-            required
           />
 
           <Input
+            name="institution"
             label="Institution Name"
-            name="education.institution"
-            value={data.institution}
-            onChange={handleChange}
+            type="text"
+            value={data.education.institution}
+            onChange={e => updateFields({ education: { ...data.education, institution: e.target.value } })}
+            error={errors.institution}
             required
           />
 
           <Input
+            name="fieldOfStudy"
             label="Field of Study"
-            name="education.fieldOfStudy"
-            value={data.fieldOfStudy}
-            onChange={handleChange}
+            type="text"
+            value={data.education.fieldOfStudy}
+            onChange={e => updateFields({ education: { ...data.education, fieldOfStudy: e.target.value } })}
+            error={errors.fieldOfStudy}
             required
           />
         </div>
 
         <Input
-          type="textarea"
-          label="Other Relevant Certifications"
           name="certifications"
-          value={data.certifications}
-          onChange={handleChange}
+          label="Other Certifications"
+          type="text"
+          value={data.education.certifications}
+          onChange={e => updateFields({ education: { ...data.education, certifications: e.target.value } })}
+          placeholder="Optional - List any relevant certifications"
         />
 
         <div className="flex justify-between">
           <Button
             type="button"
             variant="outline"
-            onClick={onBack}
+            onClick={prev}
             disabled={isSubmitting}
             className="text-[#1B4D32] border-[#1B4D32] disabled:opacity-50 hover:bg-[#1B4D32] hover:text-white"
           >
@@ -96,8 +114,8 @@ const EducationForm = ({ data, onChange, onSubmit, onBack, isSubmitting = false 
           <Button
             type="submit"
             variant="primary"
+            className="bg-[#1A5D3A] hover:bg-[#0F3622] text-white disabled:opacity-50 flex items-center"
             disabled={isSubmitting}
-            className="bg-[#1B4D32] hover:bg-[#133824] text-white disabled:opacity-50 flex items-center"
           >
             {isSubmitting ? (
               <>

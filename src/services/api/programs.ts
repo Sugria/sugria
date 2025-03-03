@@ -1,27 +1,67 @@
-import { api } from './client'
 import axios from 'axios'
+import { API_BASE_URL } from './config'
 import { validateFile } from '@/utils/fileValidation'
 import { ProgramFormData } from '@/types/program'
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  withCredentials: true
+})
+
+type ApiError = {
+  response?: {
+    status: number;
+    data: {
+      message?: string;
+      error?: {
+        message?: string;
+        details?: Record<string, string>;
+      };
+    };
+  };
+  request?: unknown;
+  message: string;
+}
 
 export const programsApi = {
   submitApplication: async (data: ProgramFormData) => {
     try {
+      // Log the data being sent
+      console.log('Submitting application data:', {
+        program: data.program,
+        personal: data.personal,
+        farm: data.farm,
+        grant: {
+          ...data.grant,
+          budget: data.grant.budget ? 'File present' : 'No file'
+        },
+        training: data.training,
+        motivation: {
+          ...data.motivation,
+          identity: data.motivation.identity ? 'File present' : 'No file'
+        },
+        declaration: data.declaration
+      })
+
       // Validate files before submission
       if (data.grant.budget) {
         const budgetValidation = validateFile(data.grant.budget)
         if (!budgetValidation.valid) {
-          throw new Error(budgetValidation.error)
+          throw new Error(budgetValidation.error || 'Invalid budget file')
         }
       }
 
       if (data.motivation.identity) {
         const identityValidation = validateFile(data.motivation.identity)
         if (!identityValidation.valid) {
-          throw new Error(identityValidation.error)
+          throw new Error(identityValidation.error || 'Invalid identity file')
         }
       }
 
-      // Create FormData and append fields exactly as in curl request
       const formData = new FormData()
 
       // Program data
@@ -41,7 +81,7 @@ export const programsApi = {
 
       // Farm data
       formData.append('farm[location]', data.farm.location)
-      formData.append('farm[size]', data.farm.size)
+      formData.append('farm[size]', Number(data.farm.size).toString())
       formData.append('farm[type]', data.farm.type)
       formData.append('farm[practices]', data.farm.practices)
       formData.append('farm[challenges]', data.farm.challenges)
@@ -49,7 +89,7 @@ export const programsApi = {
       // Grant data
       formData.append('grant[outcomes]', data.grant.outcomes)
       if (data.grant.budget) {
-        formData.append('grant.budget', data.grant.budget)
+        formData.append('budget', data.grant.budget)
       }
 
       // Training data
@@ -59,21 +99,50 @@ export const programsApi = {
       formData.append('motivation[statement]', data.motivation.statement)
       formData.append('motivation[implementation]', data.motivation.implementation)
       if (data.motivation.identity) {
-        formData.append('motivation.identity', data.motivation.identity)
+        formData.append('identity', data.motivation.identity)
       }
 
       // Declaration data
       formData.append('declaration[agreed]', String(data.declaration.agreed))
       formData.append('declaration[officerName]', data.declaration.officerName)
 
-      const response = await api.post('/programs/applications', formData)
+      // Log FormData entries
+      console.log('FormData entries:')
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value instanceof File ? 'File: ' + value.name : value}`)
+      }
+
+      const response = await api.post('/programs/applications', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      })
       return response.data
     } catch (error) {
-      console.error('Error submitting application:', error)
-      if (axios.isAxiosError(error)) {
-        throw new Error(error.response?.data?.message || 'Failed to submit application')
+      const err = error as ApiError
+      console.error('API Error:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message,
+        details: err.response?.data?.error?.details || err.response?.data?.error
+      })
+
+      if (err.response) {
+        if (err.response.status === 400) {
+          const errorMessage = 
+            err.response.data.error?.message || 
+            err.response.data.message || 
+            'Invalid application data'
+          throw new Error(errorMessage)
+        }
+        if (err.response.status === 409) {
+          throw new Error('You have already submitted an application for this program')
+        }
+        throw new Error(err.response.data.message || 'Server error')
+      } else if (err.request) {
+        throw new Error('Network Error')
       }
-      throw error
+      throw err
     }
   }
 } 

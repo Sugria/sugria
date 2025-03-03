@@ -17,6 +17,14 @@ const FarmDetails = ({ data, updateFields, next, prev }: FormStepProps) => {
       }
     })
 
+    // Validate farm size specifically
+    if (data.farm.size) {
+      const sizeNum = Number(data.farm.size)
+      if (isNaN(sizeNum) || sizeNum <= 0) {
+        newErrors.size = 'Please enter a valid farm size (must be greater than 0)'
+      }
+    }
+
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -24,6 +32,13 @@ const FarmDetails = ({ data, updateFields, next, prev }: FormStepProps) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validate()) {
+      // Convert size to number before proceeding
+      updateFields({
+        farm: {
+          ...data.farm,
+          size: Number(data.farm.size).toString() // Convert to number and back to string for consistency
+        }
+      })
       next()
     }
   }
@@ -41,13 +56,16 @@ const FarmDetails = ({ data, updateFields, next, prev }: FormStepProps) => {
       />
 
       <Input
+        type="number"
         label="Farm Size"
         name="size"
         value={data.farm.size}
         onChange={e => updateFields({ farm: { ...data.farm, size: e.target.value } })}
         error={errors.size}
         required
-        helpText="Enter size in hectares or acres"
+        min="0.01"
+        step="0.01"
+        helpText="Enter size in hectares"
       />
 
       <Input

@@ -1,10 +1,11 @@
 import axios from 'axios'
-import { API_URL } from './config'
+import { API_BASE_URL } from './config'
 
 export const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
+  baseURL: API_BASE_URL,
   headers: {
+    'Content-Type': 'application/json',
     'Accept': 'application/json'
-  }
+  },
+  withCredentials: true
 }) 

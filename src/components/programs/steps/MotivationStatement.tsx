@@ -1,40 +1,69 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/button'
 import { FormStepProps } from '@/types/program'
+import { validateFile } from '@/utils/fileValidation'
 
 const MotivationStatement = ({ data, updateFields, next, prev }: FormStepProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Show file name if file is already uploaded
+  const fileName = data.motivation.identity?.name || ''
+
+  useEffect(() => {
+    // Validate existing file when component mounts
+    if (data.motivation.identity) {
+      const validation = validateFile(data.motivation.identity)
+      if (!validation.valid) {
+        setErrors(prev => ({ ...prev, identity: validation.error || 'Invalid file' }))
+      }
+    }
+  }, [data.motivation.identity])
 
   const validate = () => {
     const newErrors: Record<string, string> = {}
-    
+
     if (!data.motivation.statement) {
-      newErrors.statement = 'Please explain why you want to participate'
+      newErrors.statement = 'Please provide your motivation statement'
     }
+
     if (!data.motivation.implementation) {
-      newErrors.implementation = 'Please describe how you plan to apply the knowledge'
+      newErrors.implementation = 'Please describe your implementation plan'
     }
+
+    // Validate identity document
     if (!data.motivation.identity) {
-      newErrors.identity = 'Please upload your proof of identity'
+      newErrors.identity = 'Please upload your identification document'
+    } else {
+      const fileValidation = validateFile(data.motivation.identity)
+      if (!fileValidation.valid) {
+        newErrors.identity = fileValidation.error || 'Invalid file'
+      }
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const validation = validateFile(file)
+      if (!validation.valid) {
+        setErrors(prev => ({ ...prev, identity: validation.error || 'Invalid file' }))
+        return
+      }
+      updateFields({ motivation: { ...data.motivation, identity: file } })
+      setErrors(prev => ({ ...prev, identity: '' }))
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validate()) {
       next()
-    }
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      updateFields({ motivation: { ...data.motivation, identity: file } })
     }
   }
 
@@ -48,7 +77,8 @@ const MotivationStatement = ({ data, updateFields, next, prev }: FormStepProps) 
         onChange={e => updateFields({ motivation: { ...data.motivation, statement: e.target.value } })}
         error={errors.statement}
         required
-        helpText="Explain why you want to participate in this program"
+        className="min-h-[120px]"
+        helpText="Why do you want to participate in this program?"
       />
 
       <Input
@@ -59,23 +89,38 @@ const MotivationStatement = ({ data, updateFields, next, prev }: FormStepProps) 
         onChange={e => updateFields({ motivation: { ...data.motivation, implementation: e.target.value } })}
         error={errors.implementation}
         required
-        helpText="Describe how you plan to apply the knowledge and funding gained"
+        className="min-h-[120px]"
+        helpText="How will you implement what you learn?"
       />
 
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-black">
-          Proof of Identity
-        </label>
-        <input
-          type="file"
-          accept=".pdf,.jpg,.jpeg,.png"
-          onChange={handleFileChange}
-          className="w-full text-gray-600 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-medium file:bg-[#1A5D3A] file:text-white hover:file:bg-[#0F3622] file:cursor-pointer cursor-pointer"
-        />
-        {errors.identity && (
-          <p className="text-sm text-red-600">{errors.identity}</p>
-        )}
-      </div>
+      <Input
+        type="file"
+        label="Identification Document"
+        name="identity"
+        onChange={handleFileChange}
+        error={errors.identity}
+        required={!data.motivation.identity} // Not required if file already uploaded
+        accept=".pdf,.doc,.docx"
+        helpText={fileName || "Upload a valid ID document (PDF, DOC, or DOCX, max 5MB)"}
+      />
+
+      {fileName && (
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span>Current file: {fileName}</span>
+          <button
+            type="button"
+            onClick={() => {
+              updateFields({ motivation: { ...data.motivation, identity: null } })
+              if (fileInputRef.current) {
+                fileInputRef.current.value = ''
+              }
+            }}
+            className="text-red-600 hover:text-red-800"
+          >
+            Remove
+          </button>
+        </div>
+      )}
 
       <div className="flex justify-between pt-4">
         <Button

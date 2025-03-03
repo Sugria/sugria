@@ -1,42 +1,22 @@
-export const validateFile = (file: File): { valid: boolean; error?: string } => {
-  // Check file size (5MB)
-  if (file.size > 5 * 1024 * 1024) {
-    return {
-      valid: false,
-      error: `File ${file.name} is too large. Maximum size is 5MB.`
-    };
-  }
-
-  // Check file type
-  const acceptedTypes = [
+export const validateFile = (file: File) => {
+  const maxSize = 5 * 1024 * 1024 // 5MB
+  const allowedTypes = [
     'application/pdf',
-    'application/x-pdf',
-    'application/acrobat',
-    'application/vnd.pdf',
-    'text/pdf',
-    'text/x-pdf',
-    'image/jpeg',
-    'image/jpg',
-    'image/png'
-  ];
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ]
 
-  if (!acceptedTypes.includes(file.type)) {
-    return {
-      valid: false,
-      error: `File ${file.name} must be a PDF, JPG, or PNG file.`
-    };
+  if (!file) {
+    return { valid: false, error: 'Please select a file' }
   }
 
-  // Check file extension
-  const extension = file.name.toLowerCase().split('.').pop();
-  const acceptedExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
-  
-  if (!extension || !acceptedExtensions.includes(extension)) {
-    return {
-      valid: false,
-      error: `File ${file.name} must have a .pdf, .jpg, .jpeg, or .png extension.`
-    };
+  if (file.size > maxSize) {
+    return { valid: false, error: 'File size must be less than 5MB' }
   }
 
-  return { valid: true };
+  if (!allowedTypes.includes(file.type)) {
+    return { valid: false, error: 'File must be PDF, DOC, or DOCX' }
+  }
+
+  return { valid: true, error: null }
 } 

@@ -1,10 +1,10 @@
-export const API_URL = process.env.NEXT_PUBLIC_API_URL
+const DEV_URL = 'http://localhost:5001'
+const PROD_URL = 'https://sugria-backend.onrender.com'
 
-if (!API_URL) {
-  throw new Error('API_URL environment variable is not defined')
-}
+export const API_BASE_URL = process.env.NODE_ENV === 'development' ? DEV_URL : PROD_URL
 
 export const API_ENDPOINTS = {
-  JOIN_MOVEMENT: `${API_URL}/members/join-movement`,
-  SUBMIT_PROGRAM_APPLICATION: `${API_URL}/programs/applications`
+  JOIN_MOVEMENT: `${API_BASE_URL}/members/join-movement`,
+  SUBMIT_APPLICATION: `${API_BASE_URL}/programs/applications`,
+  // ... other endpoints
 } as const 

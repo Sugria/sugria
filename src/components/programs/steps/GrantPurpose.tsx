@@ -1,37 +1,65 @@
 'use client'
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/button'
 import { FormStepProps } from '@/types/program'
+import { validateFile } from '@/utils/fileValidation'
 
 const GrantPurpose = ({ data, updateFields, next, prev }: FormStepProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Show file name if file is already uploaded
+  const fileName = data.grant.budget?.name || ''
+
+  useEffect(() => {
+    // Validate existing file when component mounts
+    if (data.grant.budget) {
+      const validation = validateFile(data.grant.budget)
+      if (!validation.valid) {
+        setErrors(prev => ({ ...prev, budget: validation.error || 'Invalid file' }))
+      }
+    }
+  }, [data.grant.budget])
 
   const validate = () => {
     const newErrors: Record<string, string> = {}
-    
+
     if (!data.grant.outcomes) {
       newErrors.outcomes = 'Please describe your expected outcomes'
     }
+
+    // Validate budget file
     if (!data.grant.budget) {
       newErrors.budget = 'Please upload your budget document'
+    } else {
+      const fileValidation = validateFile(data.grant.budget)
+      if (!fileValidation.valid) {
+        newErrors.budget = fileValidation.error || 'Invalid file'
+      }
     }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      const validation = validateFile(file)
+      if (!validation.valid) {
+        setErrors(prev => ({ ...prev, budget: validation.error || 'Invalid file' }))
+        return
+      }
+      updateFields({ grant: { ...data.grant, budget: file } })
+      setErrors(prev => ({ ...prev, budget: '' }))
+    }
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (validate()) {
       next()
-    }
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      updateFields({ grant: { ...data.grant, budget: file } })
     }
   }
 
@@ -45,23 +73,38 @@ const GrantPurpose = ({ data, updateFields, next, prev }: FormStepProps) => {
         onChange={e => updateFields({ grant: { ...data.grant, outcomes: e.target.value } })}
         error={errors.outcomes}
         required
-        helpText="Describe what you aim to achieve with this funding"
+        className="min-h-[120px]"
+        helpText="Describe what you hope to achieve with this grant"
       />
 
-      <div className="space-y-2">
-        <label className="block text-sm font-medium text-black">
-          Budget Document
-        </label>
-        <input
-          type="file"
-          accept=".pdf,.doc,.docx,.xls,.xlsx"
-          onChange={handleFileChange}
-          className="w-full text-gray-600 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-medium file:bg-[#1A5D3A] file:text-white hover:file:bg-[#0F3622] file:cursor-pointer cursor-pointer"
-        />
-        {errors.budget && (
-          <p className="text-sm text-red-600">{errors.budget}</p>
-        )}
-      </div>
+      <Input
+        type="file"
+        label="Budget Document"
+        name="budget"
+        onChange={handleFileChange}
+        error={errors.budget}
+        required={!data.grant.budget} // Not required if file already uploaded
+        accept=".pdf,.doc,.docx"
+        helpText={fileName || "Upload your detailed budget (PDF, DOC, or DOCX, max 5MB)"}
+      />
+
+      {fileName && (
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <span>Current file: {fileName}</span>
+          <button
+            type="button"
+            onClick={() => {
+              updateFields({ grant: { ...data.grant, budget: null } })
+              if (fileInputRef.current) {
+                fileInputRef.current.value = ''
+              }
+            }}
+            className="text-red-600 hover:text-red-800"
+          >
+            Remove
+          </button>
+        </div>
+      )}
 
       <div className="flex justify-between pt-4">
         <Button
