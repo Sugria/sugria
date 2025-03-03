@@ -20,11 +20,6 @@ const Partners = () => {
       description: 'Working with communities to end hunger and poverty by promoting sustainable agriculture and supporting local farmers.'
     },
     {
-      name: 'Mastercard Foundation',
-      logo: '/logos/mastercard.png',
-      description: 'Advancing financial inclusion and education to create opportunities for learning and prosperity in developing regions.'
-    },
-    {
       name: 'IITA',
       logo: '/logos/iita.png',
       description: 'The International Institute of Tropical Agriculture leads agricultural research and innovation for food security in Africa.'
@@ -37,7 +32,7 @@ const Partners = () => {
         <h2 className="text-5xl font-bold mb-8 text-center text-gray-900">
           Our Partners
         </h2>
-        <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {partners.map((partner, index) => (
             <div key={index} className="flex flex-col items-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
               <div className="w-32 h-32 relative mb-4 flex items-center justify-center">

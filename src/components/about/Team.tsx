@@ -1,27 +1,23 @@
 'use client'
 import AnimatedSection from '../AnimatedSection'
+import Image from 'next/image'
 
 const Team = () => {
   const team = [
     {
-      name: 'John Doe',
-      role: 'Founder & CEO',
-      image: '/placeholder.jpg'
+      name: 'Mikel T.G Niyomahoro, PhD',
+      role: 'Director General, SUGRiA',
+      image: '/team/1.jpg'
     },
     {
-      name: 'Jane Smith',
-      role: 'Head of Operations',
-      image: '/placeholder.jpg'
+      name: 'Mrs Natalie J Gasheri', 
+      role: 'Registrar, SUGRiA',
+      image: '/team/2.jpg'
     },
     {
-      name: 'Mike Johnson',
-      role: 'Agricultural Expert',
-      image: '/placeholder.jpg'
-    },
-    {
-      name: 'Sarah Williams',
-      role: 'Community Manager',
-      image: '/placeholder.jpg'
+      name: 'Mrs R.O Dall\'omo, PhD',
+      role: 'Human Resources Manager',
+      image: '/team/3.jpg'
     }
   ]
 
@@ -31,10 +27,17 @@ const Team = () => {
         <h2 className="text-3xl md:text-5xl font-bold mb-12 tracking-[-1.5px] md:tracking-[-2px] text-gray-900 text-left">
           Our Team
         </h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
           {team.map((member, index) => (
             <div key={index} className="text-left">
-              <div className="w-full aspect-square bg-gray-100 rounded-lg mb-4"></div>
+              <div className="w-full aspect-square relative rounded-lg mb-4">
+                <Image
+                  src={member.image}
+                  alt={member.name}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+              </div>
               <h3 className="text-xl font-bold tracking-[-1.5px] text-gray-900 mb-1">
                 {member.name}
               </h3>
@@ -49,4 +52,4 @@ const Team = () => {
   )
 }
 
-export default Team 
+export default Team
