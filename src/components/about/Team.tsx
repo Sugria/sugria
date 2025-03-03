@@ -16,7 +16,7 @@ const Team = () => {
     },
     {
       name: 'Mrs R.O Dall\'omo, PhD',
-      role: 'Human Resources Manager',
+      role: 'Human Resources Manager, SUGRiA',
       image: '/team/3.jpg'
     }
   ]
