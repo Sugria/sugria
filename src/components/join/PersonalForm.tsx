@@ -143,7 +143,7 @@ const PersonalForm = ({ data, onChange, onNext }: PersonalFormProps) => {
           required
           error={errors.phoneNumber}
           helpText="Enter a valid Nigerian phone number (e.g., 0801234567 or +2348012345678)"
-          placeholder="0801234567"
+          placeholder="type here"
           className="text-base sm:text-sm"
         />
       </div>
