@@ -30,12 +30,12 @@ const Team = () => {
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-8">
           {team.map((member, index) => (
             <div key={index} className="text-left">
-              <div className="w-full aspect-square relative rounded-lg mb-4">
+              <div className="w-full aspect-square relative mb-4">
                 <Image
                   src={member.image}
                   alt={member.name}
                   fill
-                  className="object-cover rounded-lg"
+                  className="object-cover"
                 />
               </div>
               <h3 className="text-xl font-bold tracking-[-1.5px] text-gray-900 mb-1">

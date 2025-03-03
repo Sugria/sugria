@@ -34,7 +34,7 @@ const Partners = () => {
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {partners.map((partner, index) => (
-            <div key={index} className="flex flex-col items-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+            <div key={index} className="flex flex-col items-center p-6 bg-white border border-gray-200 shadow-sm">
               <div className="w-32 h-32 relative mb-4 flex items-center justify-center">
                 <Image
                   src={partner.logo}
