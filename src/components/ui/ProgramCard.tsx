@@ -40,11 +40,13 @@ const ProgramCard = ({ title, description, fundingAmount, index, image }: Progra
         <div className="text-white font-semibold mb-4">
           Up to {fundingAmount} in funding
         </div>
-        <Link href="/programs">
-          <Button variant="outline" className="text-white border-white hover:bg-white hover:text-black">
-            Apply Now
-          </Button>
-        </Link>
+        <Button 
+          variant="outline" 
+          className="text-white border-white hover:bg-white hover:text-black opacity-50 cursor-not-allowed"
+          disabled
+        >
+          Apply Now
+        </Button>
       </div>
 
       {/* Desktop Default State Content */}
@@ -69,11 +71,13 @@ const ProgramCard = ({ title, description, fundingAmount, index, image }: Progra
           <div className="text-[#1A5D3A] font-semibold">
             Up to {fundingAmount} in funding
           </div>
-          <Link href="/programs">
-            <Button variant="outline" className="text-[#1A5D3A] border-[#1A5D3A] hover:bg-[#1A5D3A] hover:text-white">
-              Apply Now
-            </Button>
-          </Link>
+          <Button 
+            variant="outline" 
+            className="text-[#1A5D3A] border-[#1A5D3A] hover:bg-[#1A5D3A] hover:text-white opacity-50 cursor-not-allowed"
+            disabled
+          >
+            Apply Now
+          </Button>
         </div>
       </div>
     </motion.div>

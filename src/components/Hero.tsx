@@ -42,12 +42,14 @@ const Hero = () => {
                   Join the Movement
                 </Button>
               </Link>
-              <Button 
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-black w-full sm:w-auto text-sm md:text-base"
-              >
-                Learn More
-              </Button>
+              <Link href="/about">
+                <Button 
+                  variant="outline"
+                  className="border-white text-white hover:bg-white hover:text-black w-full sm:w-auto text-sm md:text-base"
+                >
+                  Learn More
+                </Button>
+              </Link>
             </div>
 
             {/* Stats */}

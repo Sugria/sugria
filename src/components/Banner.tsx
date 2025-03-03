@@ -29,14 +29,13 @@ const Banner = () => {
           <p className="text-base md:text-lg text-white/90 mb-8 leading-relaxed">
             The SUGRIA webinar, held every three months, is a valuable platform dedicated to advancing sustainable agriculture in Africa. For a nominal attendance fee of $2, participants gain access to insightful discussions, expert presentations, certificate of attendance and practical solutions aimed at promoting eco-friendly farming practices and food security across the continent. The small fee helps SUGRIA bootstrap operational funds, complementing donor support to sustain its mission of driving impactful agricultural innovation and resilience in Africa.
           </p>
-          <Link href="/webinar">
-            <Button 
-              variant="primary"
-              className="bg-[#1A5D3A] hover:bg-[#0F3622] text-white py-3 px-6 text-base"
-            >
-              Get A Ticket To Our Webinar
-            </Button>
-          </Link>
+          <Button 
+            variant="primary"
+            className="bg-[#1A5D3A] hover:bg-[#0F3622] text-white py-3 px-6 text-base opacity-50 cursor-not-allowed"
+            disabled
+          >
+            Get A Ticket To Our Webinar
+          </Button>
         </div>
       </div>
     </AnimatedSection>

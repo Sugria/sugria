@@ -45,10 +45,10 @@ const Header = ({ variant = 'primary' }: HeaderProps) => {
         
         {/* Desktop Menu */}
         <div className="hidden md:flex space-x-6 items-center">
-          {['About', 'Programs', 'Impact', 'Blog'].map((item) => (
+          {['About', 'Impact', 'Blog'].map((item) => (
             <a
               key={item}
-              href={item.toLowerCase() === 'about' ? '/about' : item.toLowerCase() === 'programs' ? '/programs' : `#${item.toLowerCase()}`}
+              href={item.toLowerCase() === 'about' ? '/about' : `#${item.toLowerCase()}`}
               className={`hover:underline transition-all ${
                 isScrolled || isMenuOpen ? 'text-gray-600' : 'text-white'
               }`}
@@ -94,10 +94,10 @@ const Header = ({ variant = 'primary' }: HeaderProps) => {
         >
           <div className="bg-white shadow-lg">
             <div className="container mx-auto px-4 py-6 space-y-4">
-              {['About', 'Programs', 'Impact', 'Blog'].map((item) => (
+              {['About', 'Impact', 'Blog'].map((item) => (
                 <a
                   key={item}
-                  href={item.toLowerCase() === 'about' ? '/about' : item.toLowerCase() === 'programs' ? '/programs' : `#${item.toLowerCase()}`}
+                  href={item.toLowerCase() === 'about' ? '/about' : `#${item.toLowerCase()}`}
                   className="block text-gray-600 hover:underline transition-all"
                   onClick={() => setIsMenuOpen(false)}
                 >

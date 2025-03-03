@@ -49,14 +49,13 @@ const GetInvolved = () => {
             <p className="text-white mb-8">
               Join our funding and training initiatives
             </p>
-            <Link href="/programs">
-              <Button 
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-black transition-colors"
-              >
-                Apply Now
-              </Button>
-            </Link>
+            <Button 
+              variant="outline"
+              className="border-2 border-white text-white hover:bg-white hover:text-black transition-colors opacity-50 cursor-not-allowed"
+              disabled
+            >
+              Apply Now
+            </Button>
           </div>
         </div>
 
