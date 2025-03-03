@@ -2,7 +2,6 @@
 import AnimatedSection from './AnimatedSection'
 import Button from './ui/button'
 import Image from 'next/image'
-import Link from 'next/link'
 
 const Banner = () => {
   return (

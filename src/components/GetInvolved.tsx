@@ -1,7 +1,6 @@
 'use client'
 import AnimatedSection from './AnimatedSection'
 import Button from './ui/button'
-import Link from 'next/link'
 
 const GetInvolved = () => {
   return (
