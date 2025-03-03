@@ -119,7 +119,7 @@ const PersonalForm = ({ data, updateFields, next }: PersonalFormProps) => {
         onChange={e => updateFields({ personal: { ...data.personal, phoneNumber: e.target.value } })}
         error={errors.phoneNumber}
         required
-        placeholder="e.g., 08012345678"
+        placeholder="type your phone number"
       />
 
       <Input
