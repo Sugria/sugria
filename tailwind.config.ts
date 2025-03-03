@@ -11,9 +11,13 @@ const config: Config = {
       colors: {
         'sugria-green': '#2A9D8F',
         'sugria-orange': '#E76F51'
-      }
+      },
+      fontFamily: {
+        sans: ['var(--font-inter)', 'sans-serif'],
+      },
     },
   },
   plugins: [],
 }
+
 export default config

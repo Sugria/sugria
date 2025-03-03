@@ -1,7 +1,7 @@
 'use client'
 import AnimatedSection from '../AnimatedSection'
 import Image from 'next/image'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 
 const Mission = () => {
@@ -13,8 +13,13 @@ const Mission = () => {
   const thirdSectionRef = useRef<HTMLDivElement>(null)
   const fourthSectionRef = useRef<HTMLDivElement>(null)
   
-  // Group refs in an array
-  const sectionRefs = [firstSectionRef, secondSectionRef, thirdSectionRef, fourthSectionRef]
+  // Use useMemo to prevent recreation on every render
+  const sectionRefs = useMemo(() => ({
+    first: firstSectionRef,
+    second: secondSectionRef,
+    third: thirdSectionRef,
+    fourth: fourthSectionRef
+  }), [])
 
   const images = [
     {
@@ -32,48 +37,36 @@ const Mission = () => {
   ]
 
   useEffect(() => {
-    const handleScroll = () => {
-      const elements = sectionRefs.map(ref => ref.current)
-      
-      // Find which section is most visible in the viewport
-      const visibleSectionIndex = elements.findIndex((element) => {
-        if (!element) return false
-        
-        const rect = element.getBoundingClientRect()
-        const windowHeight = window.innerHeight
-        
-        // Calculate how much of the element is visible
-        const visibleHeight = Math.min(rect.bottom, windowHeight) - Math.max(rect.top, 0)
-        const elementHeight = rect.height
-        
-        // Element is considered "most visible" if more than 75% is in viewport
-        // Increased threshold to require more visibility
-        return visibleHeight > elementHeight * 0.75
-      })
-
-      if (visibleSectionIndex !== -1) {
-        setActiveSection(visibleSectionIndex)
-      }
-    }
-
-    // Throttle scroll event to improve performance
-    let ticking = false
-    const scrollListener = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          handleScroll()
-          ticking = false
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const target = entry.target as HTMLDivElement
+            const index = Object.keys(sectionRefs).find(key => {
+              const ref = sectionRefs[key as keyof typeof sectionRefs]
+              return ref.current === target
+            })
+            if (index !== undefined) {
+              setActiveSection(parseInt(index))
+            }
+          }
         })
-        ticking = true
+      },
+      {
+        threshold: 0.75
       }
+    )
+
+    Object.values(sectionRefs).forEach((ref) => {
+      if (ref.current) observer.observe(ref.current)
+    })
+
+    return () => {
+      Object.values(sectionRefs).forEach((ref) => {
+        if (ref.current) observer.unobserve(ref.current)
+      })
     }
-
-    window.addEventListener('scroll', scrollListener)
-    // Initial check
-    handleScroll()
-
-    return () => window.removeEventListener('scroll', scrollListener)
-  }, [])
+  }, [sectionRefs])
 
   return (
     <AnimatedSection 

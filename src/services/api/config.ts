@@ -5,5 +5,6 @@ if (!API_URL) {
 }
 
 export const API_ENDPOINTS = {
-  JOIN_MOVEMENT: `${API_URL}/members/join-movement`
+  JOIN_MOVEMENT: `${API_URL}/members/join-movement`,
+  SUBMIT_PROGRAM_APPLICATION: `${API_URL}/programs/applications`
 } as const 

@@ -1,6 +1,7 @@
 'use client'
 import AnimatedSection from './AnimatedSection'
 import Button from './ui/button'
+import Link from 'next/link'
 
 const GetInvolved = () => {
   return (
@@ -10,7 +11,7 @@ const GetInvolved = () => {
           Get Involved
         </h2>
 
-        <div className="grid md:grid-cols-2 gap-2 mb-8">
+        <div className="grid md:grid-cols-3 gap-2 mb-8">
           <div className="bg-[#2E8A57] p-16">
             <h3 className="text-white text-3xl font-bold mb-4 tracking-[-1.5px] md:tracking-[-2px]">
               Partner with Us
@@ -39,6 +40,23 @@ const GetInvolved = () => {
             >
               Learn More
             </Button>
+          </div>
+
+          <div className="bg-black p-16">
+            <h3 className="text-white text-3xl font-bold mb-4 tracking-[-1.5px] md:tracking-[-2px]">
+              Apply for Programs
+            </h3>
+            <p className="text-white mb-8">
+              Join our funding and training initiatives
+            </p>
+            <Link href="/programs">
+              <Button 
+                variant="outline"
+                className="border-2 border-white text-white hover:bg-white hover:text-black transition-colors"
+              >
+                Apply Now
+              </Button>
+            </Link>
           </div>
         </div>
 
