@@ -5,20 +5,10 @@ import { useState } from 'react'
 import { FormStepProps } from '@/types/program'
 
 const programs = [
-  // {
-  //   value: 'rural',
-  //   label: 'Rural Farmers Program',
-  //   disabled: true
-  // },
   {
     value: 'suburban',
     label: 'Suburban Farmers Program',
   },
-  // {
-  //   value: 'pioneer',
-  //   label: 'Pioneer Pathways',
-  //   disabled: true
-  // },
 ]
 
 const ProgramSelect = ({ data, updateFields, next }: FormStepProps) => {
@@ -52,7 +42,7 @@ const ProgramSelect = ({ data, updateFields, next }: FormStepProps) => {
         type="select"
         label="Program Category"
         name="category"
-        value={data.program.category}
+        value={data.program.category || ''} 
         onChange={e => updateFields({ program: { ...data.program, category: e.target.value } })}
         options={programs}
         error={errors.category}
@@ -64,21 +54,21 @@ const ProgramSelect = ({ data, updateFields, next }: FormStepProps) => {
           Have you ever enrolled in any SUGRiA trainings?
         </p>
         <div className="flex gap-4">
-          <label className="flex items-center gap-2 text-gray-900 opacity-50 cursor-not-allowed">
+          <label className="flex items-center gap-2 text-gray-900">
             <input
               type="radio"
               name="previousTraining"
-              checked={data.program.previousTraining}
-              disabled
-              className="text-[#1A5D3A] focus:ring-[#1A5D3A] cursor-not-allowed"
+              checked={data.program.previousTraining === true}
+              onChange={() => updateFields({ program: { ...data.program, previousTraining: true } })}
+              className="text-[#1A5D3A] focus:ring-[#1A5D3A]"
             />
             <span className="text-black">Yes</span>
           </label>
           <label className="flex items-center gap-2 text-gray-900">
             <input
               type="radio"
-              name="previousTraining"
-              checked={!data.program.previousTraining}
+              name="previousTraining" 
+              checked={data.program.previousTraining === false}
               onChange={() => updateFields({ program: { ...data.program, previousTraining: false, trainingId: '' } })}
               className="text-[#1A5D3A] focus:ring-[#1A5D3A]"
             />
@@ -91,7 +81,7 @@ const ProgramSelect = ({ data, updateFields, next }: FormStepProps) => {
         <Input
           label="Training Ticket ID"
           name="trainingId"
-          value={data.program.trainingId}
+          value={data.program.trainingId || ''}
           onChange={e => updateFields({ program: { ...data.program, trainingId: e.target.value } })}
           error={errors.trainingId}
           required
