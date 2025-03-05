@@ -1,21 +1,24 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/button'
 import { FormStepProps } from '@/types/program'
 import { validateFile } from '@/utils/fileValidation'
+import FileUpload from '@/components/ui/FileUpload'
 
 const GrantPurpose = ({ data, updateFields, next, prev }: FormStepProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // Show file name if file is already uploaded
-  const fileName = data.grant.budget?.name || ''
 
   useEffect(() => {
     // Validate existing file when component mounts
     if (data.grant.budget) {
-      const validation = validateFile(data.grant.budget)
+      const validation = validateFile(data.grant.budget, {
+        allowedTypes: [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ]
+      })
       if (!validation.valid) {
         setErrors(prev => ({ ...prev, budget: validation.error || 'Invalid file' }))
       }
@@ -33,7 +36,13 @@ const GrantPurpose = ({ data, updateFields, next, prev }: FormStepProps) => {
     if (!data.grant.budget) {
       newErrors.budget = 'Please upload your budget document'
     } else {
-      const fileValidation = validateFile(data.grant.budget)
+      const fileValidation = validateFile(data.grant.budget, {
+        allowedTypes: [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ]
+      })
       if (!fileValidation.valid) {
         newErrors.budget = fileValidation.error || 'Invalid file'
       }
@@ -41,19 +50,6 @@ const GrantPurpose = ({ data, updateFields, next, prev }: FormStepProps) => {
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const validation = validateFile(file)
-      if (!validation.valid) {
-        setErrors(prev => ({ ...prev, budget: validation.error || 'Invalid file' }))
-        return
-      }
-      updateFields({ grant: { ...data.grant, budget: file } })
-      setErrors(prev => ({ ...prev, budget: '' }))
-    }
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -77,34 +73,16 @@ const GrantPurpose = ({ data, updateFields, next, prev }: FormStepProps) => {
         helpText="Describe what you hope to achieve with this grant"
       />
 
-      <Input
-        type="file"
+      <FileUpload
         label="Budget Document"
         name="budget"
-        onChange={handleFileChange}
-        error={errors.budget}
-        required={!data.grant.budget} // Not required if file already uploaded
         accept=".pdf,.doc,.docx"
-        helpText={fileName || "Upload your detailed budget (PDF, DOC, or DOCX, max 5MB)"}
+        onChange={(file) => updateFields({ grant: { ...data.grant, budget: file } })}
+        currentFileName={data.grant.budget?.name}
+        error={errors.budget}
+        required={!data.grant.budget}
+        helpText="Upload your detailed budget (PDF, DOC, or DOCX, max 5MB)"
       />
-
-      {fileName && (
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>Current file: {fileName}</span>
-          <button
-            type="button"
-            onClick={() => {
-              updateFields({ grant: { ...data.grant, budget: null } })
-              if (fileInputRef.current) {
-                fileInputRef.current.value = ''
-              }
-            }}
-            className="text-red-600 hover:text-red-800"
-          >
-            Remove
-          </button>
-        </div>
-      )}
 
       <div className="flex justify-between pt-4">
         <Button

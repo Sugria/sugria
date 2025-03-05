@@ -1,21 +1,25 @@
 'use client'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/button'
 import { FormStepProps } from '@/types/program'
 import { validateFile } from '@/utils/fileValidation'
+import FileUpload from '@/components/ui/FileUpload'
 
 const MotivationStatement = ({ data, updateFields, next, prev }: FormStepProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
-  // Show file name if file is already uploaded
-  const fileName = data.motivation.identity?.name || ''
 
   useEffect(() => {
     // Validate existing file when component mounts
     if (data.motivation.identity) {
-      const validation = validateFile(data.motivation.identity)
+      const validation = validateFile(data.motivation.identity, {
+        allowedTypes: [
+          'application/pdf',
+          'image/jpeg',
+          'image/jpg',
+          'image/png'
+        ]
+      })
       if (!validation.valid) {
         setErrors(prev => ({ ...prev, identity: validation.error || 'Invalid file' }))
       }
@@ -25,11 +29,11 @@ const MotivationStatement = ({ data, updateFields, next, prev }: FormStepProps) 
   const validate = () => {
     const newErrors: Record<string, string> = {}
 
-    if (!data.motivation.statement) {
+    if (!data.motivation.statement?.trim()) {
       newErrors.statement = 'Please provide your motivation statement'
     }
 
-    if (!data.motivation.implementation) {
+    if (!data.motivation.implementation?.trim()) {
       newErrors.implementation = 'Please describe your implementation plan'
     }
 
@@ -37,7 +41,14 @@ const MotivationStatement = ({ data, updateFields, next, prev }: FormStepProps) 
     if (!data.motivation.identity) {
       newErrors.identity = 'Please upload your identification document'
     } else {
-      const fileValidation = validateFile(data.motivation.identity)
+      const fileValidation = validateFile(data.motivation.identity, {
+        allowedTypes: [
+          'application/pdf',
+          'image/jpeg',
+          'image/jpg',
+          'image/png'
+        ]
+      })
       if (!fileValidation.valid) {
         newErrors.identity = fileValidation.error || 'Invalid file'
       }
@@ -47,23 +58,14 @@ const MotivationStatement = ({ data, updateFields, next, prev }: FormStepProps) 
     return Object.keys(newErrors).length === 0
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const validation = validateFile(file)
-      if (!validation.valid) {
-        setErrors(prev => ({ ...prev, identity: validation.error || 'Invalid file' }))
-        return
-      }
-      updateFields({ motivation: { ...data.motivation, identity: file } })
-      setErrors(prev => ({ ...prev, identity: '' }))
-    }
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (validate()) {
-      next()
+    try {
+      if (validate()) {
+        await next()
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error)
     }
   }
 
@@ -93,34 +95,16 @@ const MotivationStatement = ({ data, updateFields, next, prev }: FormStepProps) 
         helpText="How will you implement what you learn?"
       />
 
-      <Input
-        type="file"
+      <FileUpload
         label="Identification Document"
         name="identity"
-        onChange={handleFileChange}
+        accept=".pdf,.jpg,.jpeg,.png"
+        onChange={(file) => updateFields({ motivation: { ...data.motivation, identity: file } })}
+        currentFileName={data.motivation.identity?.name}
         error={errors.identity}
-        required={!data.motivation.identity} // Not required if file already uploaded
-        accept=".pdf,.doc,.docx"
-        helpText={fileName || "Upload a valid ID document (PDF, DOC, or DOCX, max 5MB)"}
+        required={!data.motivation.identity}
+        helpText="Upload a valid ID document (PDF, JPG, or PNG, max 5MB)"
       />
-
-      {fileName && (
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <span>Current file: {fileName}</span>
-          <button
-            type="button"
-            onClick={() => {
-              updateFields({ motivation: { ...data.motivation, identity: null } })
-              if (fileInputRef.current) {
-                fileInputRef.current.value = ''
-              }
-            }}
-            className="text-red-600 hover:text-red-800"
-          >
-            Remove
-          </button>
-        </div>
-      )}
 
       <div className="flex justify-between pt-4">
         <Button

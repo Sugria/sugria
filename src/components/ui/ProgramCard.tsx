@@ -2,6 +2,7 @@
 import { motion } from 'framer-motion'
 import Button from '@/components/ui/button'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface ProgramCardProps {
   title: string
@@ -9,9 +10,11 @@ interface ProgramCardProps {
   fundingAmount: string
   index: number
   image: string
+  disabled?: boolean
+  href: string
 }
 
-const ProgramCard = ({ title, description, fundingAmount, index, image }: ProgramCardProps) => {
+const ProgramCard = ({ title, description, fundingAmount, index, image, disabled = false, href }: ProgramCardProps) => {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -39,13 +42,15 @@ const ProgramCard = ({ title, description, fundingAmount, index, image }: Progra
         <div className="text-white font-semibold mb-4">
           Up to {fundingAmount} in funding
         </div>
-        <Button 
-          variant="outline" 
-          className="text-white border-white hover:bg-white hover:text-black opacity-50 cursor-not-allowed"
-          disabled
-        >
-          Apply Now
-        </Button>
+        <Link href={href}>
+          <Button 
+            variant="outline" 
+            className={`text-white border-white hover:bg-white hover:text-black ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={disabled}
+          >
+            Apply Now
+          </Button>
+        </Link>
       </div>
 
       {/* Desktop Default State Content */}
@@ -70,13 +75,15 @@ const ProgramCard = ({ title, description, fundingAmount, index, image }: Progra
           <div className="text-[#1A5D3A] font-semibold">
             Up to {fundingAmount} in funding
           </div>
-          <Button 
-            variant="outline" 
-            className="text-[#1A5D3A] border-[#1A5D3A] hover:bg-[#1A5D3A] hover:text-white opacity-50 cursor-not-allowed"
-            disabled
-          >
-            Apply Now
-          </Button>
+          <Link href={href}>
+            <Button 
+              variant="outline" 
+              className={`text-[#1A5D3A] border-[#1A5D3A] hover:bg-[#1A5D3A] hover:text-white ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={disabled}
+            >
+              Apply Now
+            </Button>
+          </Link>
         </div>
       </div>
     </motion.div>

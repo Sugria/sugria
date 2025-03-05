@@ -55,18 +55,20 @@ const FarmDetails = ({ data, updateFields, next, prev }: FormStepProps) => {
         helpText="Enter village, district, and region"
       />
 
-      <Input
-        type="number"
-        label="Farm Size"
-        name="size"
-        value={data.farm.size}
-        onChange={e => updateFields({ farm: { ...data.farm, size: e.target.value } })}
-        error={errors.size}
-        required
-        min="0.01"
-        step="0.01"
-        helpText="Enter size in hectares"
-      />
+      <div className="space-y-1">
+        <Input
+          type="number"
+          label="Farm Size"
+          name="size"
+          value={data.farm.size}
+          onChange={e => updateFields({ farm: { ...data.farm, size: e.target.value } })}
+          error={errors.size}
+          required
+          min="0.01"
+          step="0.01"
+        />
+        <p className="text-orange-500 text-sm">Enter size in hectares</p>
+      </div>
 
       <Input
         label="Types of Crops/Livestock"

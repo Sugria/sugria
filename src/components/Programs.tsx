@@ -6,19 +6,25 @@ const programs = [
     title: 'Rural Farmers Program',
     description: 'This program is dedicated to funding and training smallholder farmers in rural Africa. Farmers enrolled in this program receive funding and training to enhance their agricultural practices and improve their livelihoods.',
     fundingAmount: '$1,500',
-    image: '/programs/rural-farmers.jpg'
+    image: '/programs/rural-farmers.jpg',
+    disabled: true,
+    href: '/programs'
   },
   {
     title: 'Suburban Farmers Program', 
     description: 'This initiative focuses on funding and training educated farmers in suburban areas across Africa. Participants in this program benefit from funding and training, empowering them to adopt advanced farming techniques and increase productivity.',
     fundingAmount: '$3,000',
-    image: '/programs/suburban-farmers.jpg'
+    image: '/programs/suburban-farmers.jpg',
+    disabled: false,
+    href: '/programs'
   },
   {
     title: 'Pioneer Pathways',
     description: "This program supports academics and independent researchers who are driving innovative solutions and leading transformative change in Africa. Professionals in this category are eligible for funding to advance their groundbreaking work and contribute to the continent's development.",
     fundingAmount: '$5,000',
-    image: '/programs/pioneer-pathways.jpg'
+    image: '/programs/pioneer-pathways.jpg',
+    disabled: true,
+    href: '/programs'
   }
 ]
 
@@ -44,6 +50,8 @@ const Programs = () => {
               fundingAmount={program.fundingAmount}
               index={index}
               image={program.image}
+              disabled={program.disabled}
+              href={program.href}
             />
           ))}
         </div>

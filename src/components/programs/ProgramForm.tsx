@@ -7,10 +7,11 @@ import GrantPurpose from './steps/GrantPurpose'
 import TrainingPreferences from './steps/TrainingPreferences'
 import MotivationStatement from './steps/MotivationStatement'
 import Declaration from './steps/Declaration'
-import SuccessModal from '../ui/SuccessModal'
+import Success from './steps/Success'
 import { programsApi } from '@/services/api/programs'
 import Toast from '../ui/Toast'
 import { ProgramFormData } from '@/types/program'
+import { validateFile } from '@/utils/fileValidation'
 
 type FormStepProps = {
   data: ProgramFormData
@@ -54,6 +55,10 @@ const steps: FormStep[] = [
   {
     title: 'Declaration',
     Component: Declaration
+  },
+  {
+    title: 'Success',
+    Component: Success
   }
 ]
 
@@ -105,7 +110,6 @@ const ProgramForm = () => {
   const [step, setStep] = useState(0)
   const [formData, setFormData] = useState<ProgramFormData>(INITIAL_DATA)
   const [fileCache, setFileCache] = useState<FileCache>({})
-  const [showSuccess, setShowSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -165,11 +169,11 @@ const ProgramForm = () => {
 
       // Validate file formats
       if (!validateFiles(formData)) {
-        throw new Error('Please ensure all files are in the correct format (PDF, DOC, or DOCX) and under 5MB')
+        throw new Error('Please ensure all files are in the correct format and under 5MB')
       }
 
       await programsApi.submitApplication(formData)
-      setShowSuccess(true)
+      nextStep()
     } catch (error) {
       console.error('Error submitting form:', error)
       setError(error instanceof Error ? error.message : 'An unexpected error occurred')
@@ -223,50 +227,67 @@ const ProgramForm = () => {
 
   // Helper function to validate files
   const validateFiles = (data: ProgramFormData): boolean => {
-    const maxSize = 5 * 1024 * 1024 // 5MB
-    const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
-
-    // Check budget file
-    if (data.grant.budget && (
-      data.grant.budget.size > maxSize ||
-      !allowedTypes.includes(data.grant.budget.type)
-    )) {
-      return false
+    // Budget file validation
+    if (data.grant.budget) {
+      const budgetValidation = validateFile(data.grant.budget, {
+        allowedTypes: [
+          'application/pdf',
+          'application/msword',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ]
+      })
+      if (!budgetValidation.valid) return false
     }
 
-    // Check identity file
-    if (data.motivation.identity && (
-      data.motivation.identity.size > maxSize ||
-      !allowedTypes.includes(data.motivation.identity.type)
-    )) {
-      return false
+    // Identity file validation
+    if (data.motivation.identity) {
+      const identityValidation = validateFile(data.motivation.identity, {
+        allowedTypes: [
+          'application/pdf',
+          'image/jpeg',
+          'image/jpg',
+          'image/png'
+        ]
+      })
+      if (!identityValidation.valid) return false
     }
 
     return true
   }
 
+  // Update the reset functionality
+  const resetForm = () => {
+    setStep(0)
+    setFormData(INITIAL_DATA)
+    setFileCache({})
+  }
+
   return (
     <div className="relative">
-      {/* Progress Bar */}
-      <div className="flex gap-2 mb-8">
-        {steps.map((_, i) => (
-          <div
-            key={i}
-            className="flex-1 h-2  overflow-hidden bg-gray-200"
-          >
+      {/* Progress Bar - Only show for non-success steps */}
+      {step < steps.length - 1 && (
+        <div className="flex gap-2 mb-8">
+          {steps.slice(0, -1).map((_, i) => (
             <div
-              className={`h-full transition-all duration-300 ${
-                i <= step ? 'bg-[#1A6B3C]' : 'bg-transparent'
-              }`}
-            />
-          </div>
-        ))}
-      </div>
+              key={i}
+              className="flex-1 h-2 overflow-hidden bg-gray-200"
+            >
+              <div
+                className={`h-full transition-all duration-300 ${
+                  i <= step ? 'bg-[#1A6B3C]' : 'bg-transparent'
+                }`}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
-      {/* Step Title */}
-      <h2 className="text-2xl font-bold tracking-[-1.5px] text-gray-900 mb-6">
-        {steps[step].title}
-      </h2>
+      {/* Step Title - Only show for non-success steps */}
+      {step < steps.length - 1 && (
+        <h2 className="text-2xl font-bold tracking-[-1.5px] text-gray-900 mb-6">
+          {steps[step].title}
+        </h2>
+      )}
 
       {/* Form Steps */}
       <div className="mt-6">
@@ -276,9 +297,9 @@ const ProgramForm = () => {
             <StepComponent
               data={formData}
               updateFields={updateFields}
-              next={step < steps.length - 1 ? nextStep : handleSubmit}
-              prev={step > 0 ? prevStep : undefined}
-              isLastStep={step === steps.length - 1}
+              next={step === steps.length - 1 ? resetForm : (step < steps.length - 2 ? nextStep : handleSubmit)}
+              prev={step > 0 && step < steps.length - 1 ? prevStep : undefined}
+              isLastStep={step === steps.length - 2}
               isSubmitting={isSubmitting}
             />
           )
@@ -292,21 +313,6 @@ const ProgramForm = () => {
           type="error"
           onClose={() => setError(null)}
         />
-      )}
-
-      {/* Success Modal */}
-      {showSuccess && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="fixed inset-0 bg-black/50" />
-          <SuccessModal
-            isOpen={showSuccess}
-            onClose={() => {
-              setShowSuccess(false)
-              setStep(0)
-              setFormData(INITIAL_DATA)
-            }}
-          />
-        </div>
       )}
     </div>
   )

@@ -5,18 +5,20 @@ import { useState } from 'react'
 import { FormStepProps } from '@/types/program'
 
 const programs = [
-  {
-    value: 'rural',
-    label: 'Rural Farmers Program',
-  },
+  // {
+  //   value: 'rural',
+  //   label: 'Rural Farmers Program',
+  //   disabled: true
+  // },
   {
     value: 'suburban',
     label: 'Suburban Farmers Program',
   },
-  {
-    value: 'pioneer',
-    label: 'Pioneer Pathways',
-  },
+  // {
+  //   value: 'pioneer',
+  //   label: 'Pioneer Pathways',
+  //   disabled: true
+  // },
 ]
 
 const ProgramSelect = ({ data, updateFields, next }: FormStepProps) => {
@@ -62,13 +64,13 @@ const ProgramSelect = ({ data, updateFields, next }: FormStepProps) => {
           Have you ever enrolled in any SUGRiA trainings?
         </p>
         <div className="flex gap-4">
-          <label className="flex items-center gap-2 text-gray-900">
+          <label className="flex items-center gap-2 text-gray-900 opacity-50 cursor-not-allowed">
             <input
               type="radio"
               name="previousTraining"
               checked={data.program.previousTraining}
-              onChange={() => updateFields({ program: { ...data.program, previousTraining: true } })}
-              className="text-[#1A5D3A] focus:ring-[#1A5D3A]"
+              disabled
+              className="text-[#1A5D3A] focus:ring-[#1A5D3A] cursor-not-allowed"
             />
             <span className="text-black">Yes</span>
           </label>

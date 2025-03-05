@@ -44,7 +44,7 @@ export default function ProgramsPage() {
                   </p>
                 </div>
                 
-                <div className="bg-white p-4 sm:p-6 md:p-8 shadow-lg w-full lg:w-[580px] rounded-lg">
+                <div className="bg-white p-4 sm:p-6 md:p-8 shadow-lg w-full lg:w-[580px]">
                   <ProgramForm />
                 </div>
               </div>
