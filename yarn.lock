@@ -1216,6 +1216,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cookie@npm:^1.0.1":
+  version: 1.0.2
+  resolution: "cookie@npm:1.0.2"
+  checksum: 2c5a6214147ffa7135ce41860c781de17e93128689b0d080d3116468274b3593b607bcd462ac210d3a61f081db3d3b09ae106e18d60b1f529580e95cf2db8a55
+  languageName: node
+  linkType: hard
+
+"cookies-next@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "cookies-next@npm:5.1.0"
+  dependencies:
+    cookie: ^1.0.1
+  peerDependencies:
+    next: ">=15.0.0"
+    react: ">= 16.8.0"
+  checksum: d993e7ebdea157f7529206e448cc2fbb8cefa8bbeaa0188c177400d3a7f32ba68027e9d03789dc2314f33a2c980e7aaea199368cafe92477f8e7bb03b5b4bbb2
+  languageName: node
+  linkType: hard
+
 "cross-spawn@npm:^7.0.0, cross-spawn@npm:^7.0.6":
   version: 7.0.6
   resolution: "cross-spawn@npm:7.0.6"
@@ -4221,6 +4240,7 @@ __metadata:
     "@types/react-dom": ^19.0.3
     axios: ^1.8.1
     clsx: ^2.1.1
+    cookies-next: ^5.1.0
     eslint: ^9
     eslint-config-next: 15.1.7
     framer-motion: ^12.4.2
@@ -4231,7 +4251,7 @@ __metadata:
     react-dom: ^19.0.0
     react-icons: ^5.4.0
     react-intersection-observer: ^9.15.1
-    tailwind-merge: ^3.0.1
+    tailwind-merge: ^3.0.2
     tailwindcss: ^3.4.1
     typescript: ^5
   languageName: unknown
@@ -4253,10 +4273,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tailwind-merge@npm:^3.0.1":
-  version: 3.0.1
-  resolution: "tailwind-merge@npm:3.0.1"
-  checksum: a058ca9d4d1c954c68acfdd6be375023e7d6614234920f9b710562fbabb2038c5a11c9a01f1d3a77051071343489aca1bd51909caad305b3fd3b1875683ee0c9
+"tailwind-merge@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "tailwind-merge@npm:3.0.2"
+  checksum: fdcf4d9e65c8767077b93de4f6296125d9a761fce1ef85715e7cadbf467973a6b1c5fd95ca3a0416013b24ecfba61d0340f201d7becd1fc1f2f771e007bd5bd3
   languageName: node
   linkType: hard
 

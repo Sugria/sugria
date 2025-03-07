@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { API_BASE_URL } from './config'
+import { apiClient } from './client'
 
 interface MemberFormData {
   personal: {
@@ -85,6 +86,42 @@ const formatPhoneNumber = (phone: string): string => {
   }
   
   throw new Error('Invalid phone number format')
+}
+
+export interface Member {
+  id: number
+  firstName: string
+  lastName: string
+  email: string
+  phoneNumber: string
+  nationality: string
+  createdAt: string
+}
+
+interface PaginatedResponse<T> {
+  data: {
+    data: T[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      pages: number
+    }
+  }
+  timestamp: string
+  path: string
+}
+
+export const membersService = {
+  getMembers: async (): Promise<Member[]> => {
+    const response = await apiClient('/admin/members') as PaginatedResponse<Member>
+    return response.data.data
+  },
+
+  getMember: async (id: string | number) => {
+    const response = await apiClient(`/admin/members/${id}`)
+    return response.data
+  }
 }
 
 export const membersApi = {

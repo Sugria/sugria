@@ -1,5 +1,6 @@
 import './globals.css'
 import { CLOUDINARY_URLS } from '@/config/cloudinary'
+import { AuthProvider } from '@/contexts/AuthContext'
 
 export const metadata = {
   title: 'SUGRiA',
@@ -21,7 +22,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   )
 }
