@@ -16,21 +16,35 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        if (!process.env.NEXT_PUBLIC_API_URL) {
+          throw new Error('API URL is not defined')
+        }
+
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats/counts`, {
-          credentials: 'include'
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          }
         })
         
         if (!response.ok) {
-          throw new Error('Failed to fetch stats')
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
         }
         
         const result = await response.json()
-        if (!result.data) {
+        
+        if (!result.data && !result.totalMembers && !result.totalApplications) {
           throw new Error('Invalid response format')
         }
         
-        setStats(result.data)
-        console.log('Stats data:', result.data)
+        const statsData = result.data || result
+        setStats({
+          totalMembers: statsData.totalMembers,
+          totalApplications: statsData.totalApplications
+        })
+
+        console.log('Successfully fetched stats:', statsData)
       } catch (error) {
         console.error('Error fetching stats:', error)
         setError(error instanceof Error ? error.message : 'Failed to fetch stats')
@@ -45,8 +59,12 @@ export default function AdminDashboard() {
   const getStatValue = (value: number | undefined) => {
     if (loading) return "Loading..."
     if (error) return "Error"
-    if (value === undefined) return "0"
+    if (value === undefined || value === null) return "0"
     return value.toString()
+  }
+
+  if (error) {
+    console.error('Dashboard Error:', error)
   }
 
   return (
@@ -56,7 +74,6 @@ export default function AdminDashboard() {
           Dashboard
         </h1>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <StatCard
             title="Total Members"
@@ -91,7 +108,6 @@ export default function AdminDashboard() {
           />
         </div>
 
-        {/* Quick Actions */}
         <section className="mb-8">
           <h2 className="text-lg font-medium text-gray-900 mb-4">
             Quick Actions
