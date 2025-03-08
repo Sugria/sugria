@@ -38,7 +38,7 @@ const Hero = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto mb-6 md:mb-8">
               <Link href="/join">
-                <Button className="w-full sm:w-auto text-sm md:text-base bg-white text-black opacity-50 cursor-not-allowed" disabled>
+                <Button className="w-full sm:w-auto text-sm md:text-base bg-white text-black">
                   Join the Movement
                 </Button>
               </Link>
