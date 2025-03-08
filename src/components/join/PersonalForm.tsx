@@ -136,8 +136,7 @@ const PersonalForm = ({ data, updateFields, next }: PersonalFormProps) => {
         <Button
           type="submit"
           variant="primary"
-          className="bg-[#1A5D3A] hover:bg-[#0F3622] text-white opacity-50 cursor-not-allowed"
-          disabled
+          className="bg-[#1A5D3A] hover:bg-[#0F3622] text-white "
         >
           Next Step
         </Button>
