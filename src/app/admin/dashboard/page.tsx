@@ -3,6 +3,13 @@ import { useState, useEffect } from 'react'
 import StatCard from '@/components/admin/StatCard'
 import QuickActions from '@/components/admin/QuickActions'
 
+interface StatsResponse {
+  data: {
+    totalMembers: number
+    totalApplications: number
+  }
+}
+
 interface DashboardStats {
   totalMembers: number
   totalApplications: number
@@ -13,48 +20,53 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        if (!process.env.NEXT_PUBLIC_API_URL) {
-          throw new Error('API URL is not defined')
-        }
-
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats/counts`, {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        })
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}))
-          throw new Error(errorData.message || `HTTP error! status: ${response.status}`)
-        }
-        
-        const result = await response.json()
-        
-        if (!result.data && !result.totalMembers && !result.totalApplications) {
-          throw new Error('Invalid response format')
-        }
-        
-        const statsData = result.data || result
-        setStats({
-          totalMembers: statsData.totalMembers,
-          totalApplications: statsData.totalApplications
-        })
-
-        console.log('Successfully fetched stats:', statsData)
-      } catch (error) {
-        console.error('Error fetching stats:', error)
-        setError(error instanceof Error ? error.message : 'Failed to fetch stats')
-      } finally {
-        setLoading(false)
+  const fetchStats = async () => {
+    try {
+      if (!process.env.NEXT_PUBLIC_API_URL) {
+        throw new Error('API URL is not defined')
       }
-    }
 
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats/counts`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const result: StatsResponse = await response.json()
+      
+      if (!result.data || typeof result.data.totalMembers !== 'number' || typeof result.data.totalApplications !== 'number') {
+        throw new Error('Invalid response format')
+      }
+      
+      setStats({
+        totalMembers: result.data.totalMembers,
+        totalApplications: result.data.totalApplications
+      })
+
+      console.log('Successfully fetched stats:', result.data)
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+      setError(error instanceof Error ? error.message : 'Failed to fetch stats')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
     fetchStats()
   }, [])
+
+  const handleRefresh = async () => {
+    setLoading(true)
+    setError('')
+    await fetchStats()
+  }
 
   const getStatValue = (value: number | undefined) => {
     if (loading) return "Loading..."
@@ -85,6 +97,7 @@ export default function AdminDashboard() {
             }
             error={error}
             loading={loading}
+            onRefresh={handleRefresh}
           />
           <StatCard
             title="Total Applications"
@@ -96,6 +109,7 @@ export default function AdminDashboard() {
             }
             error={error}
             loading={loading}
+            onRefresh={handleRefresh}
           />
           <StatCard
             title="Pending Applications"
