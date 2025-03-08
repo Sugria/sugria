@@ -108,14 +108,18 @@ export default function MembersPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to delete member')
+        // Try to get error message from response
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Failed to delete member (${response.status})`)
       }
 
+      // Only update state if deletion was successful
       setMembers(members.filter(member => member.id !== id))
+      setDeleteModal({ isOpen: false, memberId: null })
       toast.success('Member deleted successfully')
     } catch (error) {
       console.error('Error deleting member:', error)
-      toast.error('Failed to delete member')
+      toast.error(error instanceof Error ? error.message : 'Failed to delete member')
     }
   }
 

@@ -94,7 +94,7 @@ export default function ApplicationsPage() {
 
   const handleDeleteApplication = async (id: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/applications/${id}`, {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -103,14 +103,18 @@ export default function ApplicationsPage() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to delete application')
+        // Try to get error message from response
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || `Failed to delete application (${response.status})`)
       }
 
+      // Only update state if deletion was successful
       setApplications(applications.filter(app => app.applicationId !== id))
+      setDeleteModal({ isOpen: false, applicationId: null })
       toast.success('Application deleted successfully')
     } catch (error) {
       console.error('Error deleting application:', error)
-      toast.error('Failed to delete application')
+      toast.error(error instanceof Error ? error.message : 'Failed to delete application')
     }
   }
 
