@@ -29,6 +29,20 @@ interface Application {
   }
 }
 
+interface ApplicationResponse {
+  data: {
+    data: Application[]
+    meta: {
+      total: number
+      page: number
+      limit: number
+      pages: number
+    }
+  }
+  timestamp: string
+  path: string
+}
+
 export default function ApplicationsPage() {
   const router = useRouter()
   const [applications, setApplications] = useState<Application[]>([])
@@ -48,14 +62,23 @@ export default function ApplicationsPage() {
   useEffect(() => {
     const fetchApplications = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/applications`)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/applications?page=1&limit=10000`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        })
+
         if (!response.ok) {
           throw new Error('Failed to fetch applications')
         }
-        const result = await response.json()
+
+        const result: ApplicationResponse = await response.json()
         if (!result.data?.data) {
           throw new Error('Invalid response format')
         }
+
         setApplications(result.data.data)
       } catch (error) {
         console.error('Failed to fetch applications:', error)
@@ -116,6 +139,55 @@ export default function ApplicationsPage() {
       console.error('Error deleting application:', error)
       toast.error(error instanceof Error ? error.message : 'Failed to delete application')
     }
+  }
+
+  // Generate pagination numbers with ellipsis
+  const generatePaginationNumbers = () => {
+    const delta = 1; // Number of pages to show before and after current page
+    const range = [];
+
+    // Always show first page
+    range.push(1);
+
+    if (totalPages <= 10) {
+      // If total pages is 10 or less, show all pages
+      for (let i = 2; i < totalPages; i++) {
+        range.push(i);
+      }
+    } else {
+      // For larger page counts, show selected pages with ellipsis
+      if (currentPage <= 4) {
+        // Near the start
+        for (let i = 2; i <= 5; i++) {
+          range.push(i);
+        }
+        range.push('...');
+        range.push(totalPages - 1);
+      } else if (currentPage >= totalPages - 3) {
+        // Near the end
+        range.push(2);
+        range.push('...');
+        for (let i = totalPages - 4; i < totalPages; i++) {
+          range.push(i);
+        }
+      } else {
+        // Somewhere in the middle
+        range.push(2);
+        range.push('...');
+        for (let i = currentPage - delta; i <= currentPage + delta; i++) {
+          range.push(i);
+        }
+        range.push('...');
+        range.push(totalPages - 1);
+      }
+    }
+
+    // Always show last page
+    if (totalPages > 1) {
+      range.push(totalPages);
+    }
+
+    return range;
   }
 
   return (
@@ -271,14 +343,16 @@ export default function ApplicationsPage() {
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                {generatePaginationNumbers().map((page, index) => (
                   <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
+                    key={index}
+                    onClick={() => typeof page === 'number' ? setCurrentPage(page) : null}
                     className={`px-3 py-1 rounded-md ${
-                      currentPage === page 
+                      page === currentPage 
                         ? 'bg-[#1A5D3A] text-white' 
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : page === '...' 
+                          ? 'text-gray-600 cursor-default'
+                          : 'text-gray-600 hover:bg-gray-100'
                     }`}
                   >
                     {page}
