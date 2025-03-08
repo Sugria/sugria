@@ -12,8 +12,24 @@ import {
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/button'
 import { formatDate } from '@/lib/utils'
-import { membersService, type Member } from '@/services/api/members'
+import type { Member } from '@/services/api/members'
 import { Eye, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { toast } from 'sonner'
+import ConfirmationModal from '@/components/ui/ConfirmationModal'
+
+interface MemberResponse {
+  data: {
+    data: Member[]
+    meta: {
+      total: number
+      page: string
+      limit: string
+      pages: number
+    }
+  }
+  timestamp: string
+  path: string
+}
 
 export default function MembersPage() {
   const router = useRouter()
@@ -23,12 +39,35 @@ export default function MembersPage() {
   const [error, setError] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean
+    memberId: number | null
+  }>({
+    isOpen: false,
+    memberId: null
+  })
 
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const data = await membersService.getMembers()
-        setMembers(data)
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/members?page=1&limit=100000`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        })
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch members')
+        }
+
+        const result: MemberResponse = await response.json()
+        if (!result.data?.data) {
+          throw new Error('Invalid response format')
+        }
+
+        setMembers(result.data.data)
       } catch (error) {
         console.error('Failed to fetch members:', error)
         setError('Failed to fetch members. Please try again later.')
@@ -57,6 +96,28 @@ export default function MembersPage() {
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
   const currentMembers = filteredMembers.slice(startIndex, endIndex)
+
+  const handleDeleteMember = async (id: number) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/members/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete member')
+      }
+
+      setMembers(members.filter(member => member.id !== id))
+      toast.success('Member deleted successfully')
+    } catch (error) {
+      console.error('Error deleting member:', error)
+      toast.error('Failed to delete member')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-6">
@@ -176,8 +237,8 @@ export default function MembersPage() {
                           </button>
                           <button 
                             onClick={(e) => {
-                              e.stopPropagation();
-                              // Add delete logic here
+                              e.stopPropagation()
+                              setDeleteModal({ isOpen: true, memberId: member.id })
                             }}
                             className="p-2 hover:bg-red-100 rounded-full"
                           >
@@ -231,6 +292,19 @@ export default function MembersPage() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, memberId: null })}
+        onConfirm={() => {
+          if (deleteModal.memberId) {
+            handleDeleteMember(deleteModal.memberId)
+          }
+        }}
+        title="Delete Member"
+        message="Are you sure you want to delete this member? This action cannot be undone."
+      />
     </div>
   )
 }

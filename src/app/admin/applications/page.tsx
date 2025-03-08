@@ -12,6 +12,8 @@ import {
 import Input from '@/components/ui/Input'
 import { formatDate } from '@/lib/utils'
 import { ChevronLeft, ChevronRight, Eye, Edit, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+import ConfirmationModal from '@/components/ui/ConfirmationModal'
 
 interface Application {
   applicationId: string
@@ -35,6 +37,13 @@ export default function ApplicationsPage() {
   const [error, setError] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 10
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean
+    applicationId: string | null
+  }>({
+    isOpen: false,
+    applicationId: null
+  })
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -80,6 +89,28 @@ export default function ApplicationsPage() {
         return 'bg-red-100 text-red-800'
       default:
         return 'bg-yellow-100 text-yellow-800'
+    }
+  }
+
+  const handleDeleteApplication = async (id: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/applications/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete application')
+      }
+
+      setApplications(applications.filter(app => app.applicationId !== id))
+      toast.success('Application deleted successfully')
+    } catch (error) {
+      console.error('Error deleting application:', error)
+      toast.error('Failed to delete application')
     }
   }
 
@@ -206,8 +237,8 @@ export default function ApplicationsPage() {
                           </button>
                           <button 
                             onClick={(e) => {
-                              e.stopPropagation();
-                              // Add delete logic here
+                              e.stopPropagation()
+                              setDeleteModal({ isOpen: true, applicationId: application.applicationId })
                             }}
                             className="p-2 hover:bg-red-100 rounded-full"
                           >
@@ -261,6 +292,19 @@ export default function ApplicationsPage() {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, applicationId: null })}
+        onConfirm={() => {
+          if (deleteModal.applicationId) {
+            handleDeleteApplication(deleteModal.applicationId)
+          }
+        }}
+        title="Delete Application"
+        message="Are you sure you want to delete this application? This action cannot be undone."
+      />
     </div>
   )
 } 
