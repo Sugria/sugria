@@ -119,6 +119,42 @@ export default function MembersPage() {
     }
   }
 
+  // Generate pagination numbers
+  const generatePaginationNumbers = () => {
+    const delta = 2;
+    const range = [];
+    const rangeWithDots = [];
+
+    // Always show first page
+    range.push(1);
+
+    for (let i = currentPage - delta; i <= currentPage + delta; i++) {
+      if (i > 1 && i < totalPages) {
+        range.push(i);
+      }
+    }
+
+    // Always show last page
+    if (totalPages > 1) {
+      range.push(totalPages);
+    }
+
+    let l;
+    for (const i of range) {
+      if (l) {
+        if (i - l === 2) {
+          rangeWithDots.push(l + 1);
+        } else if (i - l !== 1) {
+          rangeWithDots.push('...');
+        }
+      }
+      rangeWithDots.push(i);
+      l = i;
+    }
+
+    return rangeWithDots;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -267,14 +303,16 @@ export default function MembersPage() {
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                {generatePaginationNumbers().map((page, index) => (
                   <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
+                    key={index}
+                    onClick={() => typeof page === 'number' ? setCurrentPage(page) : null}
                     className={`px-3 py-1 rounded-md ${
-                      currentPage === page 
+                      page === currentPage 
                         ? 'bg-[#1A5D3A] text-white' 
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : page === '...' 
+                          ? 'text-gray-600 cursor-default'
+                          : 'text-gray-600 hover:bg-gray-100'
                     }`}
                   >
                     {page}
