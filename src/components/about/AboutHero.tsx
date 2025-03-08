@@ -17,7 +17,7 @@ const AboutHero = () => {
       {/* Content */}
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl">
-          <h1 className="text-4xl md:text-7xl font-bold mb-4 leading-[100%] tracking-[-1.5px] md:tracking-[-3px]">
+          <h1 className="text-4xl md:text-7xl font-bold mb-4 leading-[100%] tracking-[-1.5px] md:tracking-[-3px] text-white">
             Sustainable Green<br />
             Revolution in Africa
           </h1>
