@@ -213,6 +213,9 @@ export default function ApplicationDetailsView({ applicationId }: { applicationI
           </div>
         </div>
 
+        {/* Added 100px spacing */}
+        <div className="h-[100px]"></div>
+
         <div className="flex gap-6">
           {/* Main Content */}
           <div className="flex-1 space-y-6">
