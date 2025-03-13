@@ -11,6 +11,7 @@ interface PersonalFormProps {
   fields?: {
     fullName?: boolean
     email?: boolean
+    workEmail?: boolean
     dateOfBirth?: boolean
     gender?: boolean
     nationality?: boolean
@@ -21,6 +22,7 @@ interface PersonalFormProps {
 
 const PersonalForm = ({ data, updateFields, next, fields }: PersonalFormProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [loading, setLoading] = useState(false)
 
   // Default all fields to true if no fields prop provided
   const displayFields = fields || {
@@ -39,10 +41,10 @@ const PersonalForm = ({ data, updateFields, next, fields }: PersonalFormProps) =
     if (displayFields.fullName && !data.personal.fullName) {
       newErrors.fullName = 'Full name is required'
     }
-    if (displayFields.email && !data.personal.email) {
-      newErrors.email = 'Email is required'
-    } else if (displayFields.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.personal.email)) {
-      newErrors.email = 'Please enter a valid email address'
+    if (displayFields.email && !data.personal.workEmail) {
+      newErrors.email = 'Work email is required'
+    } else if (displayFields.email && !data.personal.workEmail.endsWith('@sugria.com')) {
+      newErrors.email = 'Please enter a valid @sugria.com email address'
     }
     if (displayFields.dateOfBirth && !data.personal.dateOfBirth) {
       newErrors.dateOfBirth = 'Date of birth is required'
@@ -64,15 +66,54 @@ const PersonalForm = ({ data, updateFields, next, fields }: PersonalFormProps) =
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (validate()) {
-      next()
+      setLoading(true)
+      try {
+        // Just update the form data and move to next step
+        // No API call here
+        next()
+      } catch (error) {
+        console.error('Validation failed:', error)
+        setErrors({ submit: 'Failed to validate information' })
+      } finally {
+        setLoading(false)
+      }
+    }
+  }
+
+  const handleEmailBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const emailValue = e.target.value
+    if (emailValue && !emailValue.endsWith('@sugria.com')) {
+      setErrors(prev => ({
+        ...prev,
+        email: 'Please enter a valid @sugria.com email address'
+      }))
+    } else {
+      setErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors.email
+        return newErrors
+      })
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Work email input */}
+      <Input
+        name="workEmail"
+        label="Sugria Work Email"
+        type="email"
+        value={data.personal.workEmail}
+        onChange={e => updateFields({ personal: { ...data.personal, workEmail: e.target.value } })}
+        onBlur={handleEmailBlur}
+        error={errors.email}
+        required
+        placeholder="example@sugria.com"
+      />
+
       {displayFields.fullName && (
         <Input
           name="fullName"
@@ -81,18 +122,6 @@ const PersonalForm = ({ data, updateFields, next, fields }: PersonalFormProps) =
           value={data.personal.fullName}
           onChange={e => updateFields({ personal: { ...data.personal, fullName: e.target.value } })}
           error={errors.fullName}
-          required
-        />
-      )}
-
-      {displayFields.email && (
-        <Input
-          name="email"
-          label="Email"
-          type="email"
-          value={data.personal.email}
-          onChange={e => updateFields({ personal: { ...data.personal, email: e.target.value } })}
-          error={errors.email}
           required
         />
       )}
@@ -173,10 +202,15 @@ const PersonalForm = ({ data, updateFields, next, fields }: PersonalFormProps) =
           type="submit"
           variant="primary"
           className="bg-[#1A5D3A] hover:bg-[#0F3622] text-white disabled:opacity-20 disabled:cursor-not-allowed"
+          disabled={loading}
         >
-          Next Step
+          {loading ? 'Updating...' : 'Next Step'}
         </Button>
       </div>
+      
+      {errors.submit && (
+        <p className="text-red-500 text-sm mt-2">{errors.submit}</p>
+      )}
     </form>
   )
 }

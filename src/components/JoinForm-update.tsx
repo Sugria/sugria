@@ -1,10 +1,9 @@
 'use client'
 import { useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import PersonalForm from './join/PersonalForm'
+import PersonalForm from './join/PersonalForm-update'
 import EmergencyForm from './join/EmergencyForm'
 import EducationForm from './join/EducationForm'
-import SuccessModal from './ui/SuccessModal'
 import { membersApi } from '@/services/api/members'
 import Toast from './ui/Toast'
 
@@ -12,6 +11,7 @@ interface FormData {
   personal: {
     fullName: string
     email: string
+    workEmail: string
     dateOfBirth: string
     gender: string
     nationality: string
@@ -33,7 +33,6 @@ interface FormData {
 }
 
 interface JoinFormProps {
-  isUpdate?: boolean
   initialEmail?: string
 }
 
@@ -41,6 +40,7 @@ const INITIAL_DATA: FormData = {
   personal: {
     fullName: '',
     email: '',
+    workEmail: '',
     dateOfBirth: '',
     gender: '',
     nationality: '',
@@ -60,23 +60,24 @@ const INITIAL_DATA: FormData = {
   }
 }
 
-const JoinForm = ({ isUpdate = false, initialEmail = '' }: JoinFormProps) => {
+const JoinForm = ({ initialEmail = '' }: JoinFormProps) => {
   const searchParams = useSearchParams()
   const recoveryToken = process.env.NODE_ENV === 'development' 
-    ? 'test-token-123' 
+    ? '86ea3c6f-e622-47b0-978b-455c97c2b240' 
     : searchParams.get('token')
   const [step, setStep] = useState(0)
   const [formData, setFormData] = useState<FormData>({
     ...INITIAL_DATA,
     personal: {
       ...INITIAL_DATA.personal,
-      email: initialEmail
+      email: initialEmail,
+      workEmail: ''
     },
     recoveryToken: recoveryToken || ''
   })
-  const [showSuccess, setShowSuccess] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   const updateFields = (fields: Partial<FormData>) => {
     setFormData(prev => ({ ...prev, ...fields }))
@@ -89,37 +90,39 @@ const JoinForm = ({ isUpdate = false, initialEmail = '' }: JoinFormProps) => {
     if (!validateForm()) return
     setIsSubmitting(true)
     setError(null)
+    setSuccess(null)
 
     try {
-      if (isUpdate && recoveryToken) {
-        await membersApi.updateMember(recoveryToken, {
-          firstName: formData.personal.fullName.split(' ')[0],
-          lastName: formData.personal.fullName.split(' ').slice(1).join(' '),
-          email: formData.personal.email,
-          dateOfBirth: formData.personal.dateOfBirth,
-          gender: formData.personal.gender,
-          nationality: formData.personal.nationality,
-          phoneNumber: formData.personal.phoneNumber,
-          residentialAddress: formData.personal.address,
-          emergencyContact: {
-            name: formData.emergency.name,
-            relationship: formData.emergency.relationship,
-            phoneNumber: formData.emergency.phone
-          },
-          education: {
-            highestLevel: formData.education.level,
-            institutionName: formData.education.institution,
-            fieldOfStudy: formData.education.fieldOfStudy,
-            otherCertifications: formData.education.certifications
-          }
-        })
-      } else {
-        await membersApi.joinMovement(formData)
-      }
-      setShowSuccess(true)
+      await membersApi.updateMember(recoveryToken!, {
+        firstName: formData.personal.fullName.split(' ')[0],
+        lastName: formData.personal.fullName.split(' ').slice(1).join(' '),
+        email: formData.personal.email,
+        workEmail: formData.personal.workEmail,
+        dateOfBirth: formData.personal.dateOfBirth,
+        gender: formData.personal.gender,
+        nationality: formData.personal.nationality,
+        phoneNumber: formData.personal.phoneNumber,
+        residentialAddress: formData.personal.address,
+        emergencyContact: {
+          name: formData.emergency.name,
+          relationship: formData.emergency.relationship,
+          phoneNumber: formData.emergency.phone
+        },
+        education: {
+          highestLevel: formData.education.level,
+          institutionName: formData.education.institution,
+          fieldOfStudy: formData.education.fieldOfStudy,
+          otherCertifications: formData.education.certifications || null
+        }
+      })
+      setSuccess('Your information has been successfully updated!')
+      setStep(0)
+      setFormData(INITIAL_DATA)
     } catch (error) {
       console.error('Error submitting form:', error)
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred')
+      setError(error instanceof Error 
+        ? error.message 
+        : 'An unexpected error occurred while updating your information')
     } finally {
       setIsSubmitting(false)
     }
@@ -127,7 +130,7 @@ const JoinForm = ({ isUpdate = false, initialEmail = '' }: JoinFormProps) => {
 
   const validateForm = () => {
     // Validate personal information
-    if (!formData.personal.fullName || !formData.personal.email || 
+    if (!formData.personal.fullName || !formData.personal.workEmail || 
         !formData.personal.dateOfBirth || !formData.personal.gender || 
         !formData.personal.nationality || !formData.personal.phoneNumber || 
         !formData.personal.address) {
@@ -160,7 +163,7 @@ const JoinForm = ({ isUpdate = false, initialEmail = '' }: JoinFormProps) => {
       next={nextStep}
       fields={{
         fullName: true,
-        email: true,
+        workEmail: true,
         dateOfBirth: true,
         gender: true,
         nationality: true,
@@ -187,6 +190,7 @@ const JoinForm = ({ isUpdate = false, initialEmail = '' }: JoinFormProps) => {
 
   return (
     <div className="max-w-2xl mx-auto p-6">
+
       {/* Progress Bar */}
       <div className="flex gap-2 mb-8">
         {steps.map((_, i) => (
@@ -203,6 +207,19 @@ const JoinForm = ({ isUpdate = false, initialEmail = '' }: JoinFormProps) => {
         ))}
       </div>
 
+       {/* Show prefilled email from validation */}
+       <div className="mb-6">
+        <input
+          type="email"
+          value={initialEmail}
+          disabled
+          className="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 cursor-not-allowed"
+        />
+        <p className="mt-1 text-sm text-orange-500">
+          This email was used to send you the update link
+        </p>
+      </div>
+
       {/* Form Steps */}
       {steps[step]}
 
@@ -215,19 +232,13 @@ const JoinForm = ({ isUpdate = false, initialEmail = '' }: JoinFormProps) => {
         />
       )}
 
-      {/* Success Modal */}
-      {showSuccess && (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="fixed inset-0 bg-black/50" />
-          <SuccessModal
-            isOpen={showSuccess}
-            onClose={() => {
-              setShowSuccess(false)
-              setStep(0)
-              setFormData(INITIAL_DATA)
-            }}
-          />
-        </div>
+      {/* Success Toast */}
+      {success && (
+        <Toast
+          message={success}
+          type="success" 
+          onClose={() => setSuccess(null)}
+        />
       )}
     </div>
   )

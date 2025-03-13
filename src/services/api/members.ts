@@ -195,5 +195,74 @@ export const membersApi = {
       }
       throw err
     }
+  },
+
+  updateMember: async (token: string, data: {
+    firstName: string
+    lastName: string
+    email: string
+    workEmail: string
+    dateOfBirth: string
+    gender: string
+    nationality: string
+    phoneNumber: string
+    residentialAddress: string
+    emergencyContact: {
+      name: string
+      relationship: string
+      phoneNumber: string
+    }
+    education: {
+      highestLevel: string
+      institutionName: string
+      fieldOfStudy: string
+      otherCertifications: string | null
+    }
+  }) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/members/update/${token}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          workEmail: data.workEmail,
+          dateOfBirth: data.dateOfBirth,
+          gender: data.gender,
+          nationality: data.nationality,
+          phoneNumber: data.phoneNumber,
+          residentialAddress: data.residentialAddress,
+          emergencyContact: {
+            name: data.emergencyContact.name,
+            relationship: data.emergencyContact.relationship,
+            phoneNumber: data.emergencyContact.phoneNumber
+          },
+          education: {
+            highestLevel: data.education.highestLevel,
+            institutionName: data.education.institutionName,
+            fieldOfStudy: data.education.fieldOfStudy,
+            otherCertifications: data.education.otherCertifications || null
+          }
+        }),
+      })
+
+      const responseData = await response.json()
+
+      if (!response.ok) {
+        const errorMessage = typeof responseData.message === 'string' 
+          ? responseData.message 
+          : 'Failed to update member information'
+        throw new Error(errorMessage)
+      }
+
+      return responseData
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error
+      }
+      throw new Error('Network error occurred')
+    }
   }
 } 

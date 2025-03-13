@@ -2,6 +2,7 @@ export interface FormData {
   personal: {
     fullName: string
     email: string
+    workEmail: string
     dateOfBirth: string
     gender: string
     nationality: string
@@ -11,7 +12,7 @@ export interface FormData {
   emergency: {
     name: string
     relationship: string
-    phone: string
+    phoneNumber: string
   }
   education: {
     level: string
@@ -19,4 +20,5 @@ export interface FormData {
     fieldOfStudy: string
     certifications: string
   }
+  recoveryToken?: string
 } 

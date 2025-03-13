@@ -1,8 +1,14 @@
+'use client'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import Link from 'next/link'
 import JoinForm from '@/components/JoinForm'
 import AnimatedSection from '@/components/AnimatedSection'
 
-export default function JoinPage() {
+function JoinFormContent() {
+  const searchParams = useSearchParams()
+  const email = searchParams.get('email')
+
   return (
     <main className="min-h-screen bg-white flex flex-col">
       <div className="relative">
@@ -41,12 +47,26 @@ export default function JoinPage() {
               </div>
               
               <div className="bg-white p-4 sm:p-6 md:p-8 shadow-lg w-full lg:w-[580px]">
-                <JoinForm />
+                <JoinForm initialEmail={email || ''} />
               </div>
             </div>
           </div>
         </AnimatedSection>
       </div>
     </main>
+  )
+}
+
+export default function JoinPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-white flex flex-col items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl text-gray-700">Loading...</h2>
+        </div>
+      </main>
+    }>
+      <JoinFormContent />
+    </Suspense>
   )
 }
