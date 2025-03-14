@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import PersonalForm from './join/PersonalForm-update'
 import EmergencyForm from './join/EmergencyForm'
 import EducationForm from './join/EducationForm'
@@ -61,6 +61,7 @@ const INITIAL_DATA: FormData = {
 }
 
 const JoinForm = ({ initialEmail = '' }: JoinFormProps) => {
+  const router = useRouter()
   const searchParams = useSearchParams()
   const recoveryToken = process.env.NODE_ENV === 'development' 
     ? '86ea3c6f-e622-47b0-978b-455c97c2b240' 
@@ -118,6 +119,8 @@ const JoinForm = ({ initialEmail = '' }: JoinFormProps) => {
       setSuccess('Your information has been successfully updated!')
       setStep(0)
       setFormData(INITIAL_DATA)
+      // Redirect to home page after successful submission
+      router.push('/')
     } catch (error) {
       console.error('Error submitting form:', error)
       setError(error instanceof Error 
