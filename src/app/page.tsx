@@ -4,7 +4,7 @@ import Transform from '@/components/Transform'
 import WhatWeDo from '@/components/WhatWeDo'
 import Impact from '@/components/Impact'
 import Programs from '@/components/Programs'
-import Banner from '@/components/Banner'
+// import Banner from '@/components/Banner'
 import GetInvolved from '@/components/GetInvolved'
 import Footer from '@/components/Footer'
 
