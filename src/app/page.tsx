@@ -17,7 +17,7 @@ export default function Home() {
       <WhatWeDo />
       <Impact />
       <Programs />
-      <Banner />
+      {/* <Banner /> */}
       <GetInvolved />
       <Footer />
     </main>
