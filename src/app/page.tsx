@@ -10,8 +10,8 @@
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white flex items-center justify-center">
-      <h1 className="text-2xl font-medium text-black">Contact site admin for more information</h1>
+    <main className="min-h-screen bg-white flex items-center justify-center px-4 text-center">
+      <h1 className="text-2xl md:text-3xl lg:text-4xl font-medium text-black text-center mx-auto max-w-3xl">Contact site admin for more information</h1>
       {/* <Header />
       <Hero />
       <Transform />
